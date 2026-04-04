@@ -113,6 +113,21 @@ const api = {
   updateBudget: (id, data) => request('PATCH', `/api/budgets/${id}/`, data),
   deleteBudget: (id) => request('DELETE', `/api/budgets/${id}/`),
 
+  // Account Types
+  getAccountTypes: () => request('GET', '/api/account-types/'),
+  createAccountType: (data) => request('POST', '/api/account-types/', data),
+  updateAccountType: (id, data) => request('PATCH', `/api/account-types/${id}/`, data),
+  deleteAccountType: (id) => request('DELETE', `/api/account-types/${id}/`),
+
+  // Account Sub-Types
+  getAccountSubTypes: (params) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return request('GET', `/api/account-sub-types/${qs ? '?' + qs : ''}`);
+  },
+  createAccountSubType: (data) => request('POST', '/api/account-sub-types/', data),
+  updateAccountSubType: (id, data) => request('PATCH', `/api/account-sub-types/${id}/`, data),
+  deleteAccountSubType: (id) => request('DELETE', `/api/account-sub-types/${id}/`),
+
   // Settings
   getSettings: () => request('GET', '/api/settings/'),
   updateSetting: (key, value) => request('PUT', `/api/settings/${key}/`, { value }),

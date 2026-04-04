@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '../common/Card';
 import Dropdown from '../common/Dropdown';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 
-const ACCOUNT_TYPES = ['asset', 'liability', 'receivable'];
+// Account types and sub-types are now loaded dynamically from the API via DataContext.
 
 const inputClass =
   'text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 hover:border-gray-300 transition-colors';
@@ -120,13 +120,27 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
 }
 
 export default function AccountManager() {
-  const { accounts, entries, addAccount, updateAccount } = useData();
+  const { accounts, entries, accountTypes, addAccount, updateAccount } = useData();
   const { owners } = useOwners();
 
-  const [newName, setNewName]   = useState('');
-  const [newType, setNewType]   = useState('asset');
-  const [adding, setAdding]     = useState(false);
-  const [error, setError]       = useState('');
+  const [newName, setNewName]       = useState('');
+  const [newType, setNewType]       = useState('');
+  const [newSubType, setNewSubType] = useState('');
+  const [adding, setAdding]         = useState(false);
+  const [error, setError]           = useState('');
+
+  // Set defaults once account types are loaded
+  useEffect(() => {
+    if (accountTypes.length > 0 && !newType) {
+      const first = accountTypes[0];
+      setNewType(first.name);
+      const subs = first.sub_types ?? [];
+      if (subs.length > 0) setNewSubType(subs[0].name);
+    }
+  }, [accountTypes, newType]);
+
+  const selectedAccountType = accountTypes.find((t) => t.name === newType);
+  const subTypeOptions = selectedAccountType?.sub_types ?? [];
 
   const accountsWithEntries = new Set(entries.map((e) => e.account_id));
 
@@ -138,7 +152,7 @@ export default function AccountManager() {
     await addAccount({
       name: trimmed,
       type: newType,
-      sub_type: newType === 'asset' ? 'bank' : newType === 'liability' ? 'credit_card' : 'receivable',
+      sub_type: newSubType,
       currency: 'INR',
       is_active: true,
     });
@@ -163,10 +177,22 @@ export default function AccountManager() {
           />
           <Dropdown
             value={newType}
-            onChange={setNewType}
-            options={ACCOUNT_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))}
+            onChange={(val) => {
+              setNewType(val);
+              const subs = accountTypes.find((t) => t.name === val)?.sub_types ?? [];
+              setNewSubType(subs.length > 0 ? subs[0].name : '');
+            }}
+            options={accountTypes.map((t) => ({ value: t.name, label: t.label }))}
             className="min-w-[130px]"
           />
+          {subTypeOptions.length > 0 && (
+            <Dropdown
+              value={newSubType}
+              onChange={setNewSubType}
+              options={subTypeOptions.map((s) => ({ value: s.name, label: s.label }))}
+              className="min-w-[130px]"
+            />
+          )}
           <button
             onClick={handleAdd}
             disabled={adding}

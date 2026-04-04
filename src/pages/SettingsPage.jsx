@@ -3,11 +3,13 @@ import CategoryManager from '../components/settings/CategoryManager';
 import AccountManager from '../components/settings/AccountManager';
 import TagManager from '../components/settings/TagManager';
 import OwnerSettings from '../components/settings/OwnerSettings';
+import AccountTypeManager from '../components/settings/AccountTypeManager';
 import DataExport from '../components/settings/DataExport';
 
 const SECTIONS = [
   { id: 'categories',   label: 'Categories',   icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z' },
   { id: 'accounts',     label: 'Accounts',     icon: 'M2 7a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V7z M16 14a2 2 0 100-4 2 2 0 000 4z' },
+  { id: 'account-types', label: 'Account Types', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
   { id: 'owners',       label: 'Owners',       icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
   { id: 'tags',         label: 'Tags',         icon: 'M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z M6 6h.008v.008H6V6z' },
   { id: 'export',       label: 'Data Export',   icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' },
@@ -91,6 +93,7 @@ export default function SettingsPage() {
         <div className="flex-1 min-w-0">
           {activeSection === 'categories'  && <CategoryManager />}
           {activeSection === 'accounts'    && <AccountManager />}
+          {activeSection === 'account-types' && <AccountTypeManager />}
           {activeSection === 'owners'      && <OwnerSettings />}
           {activeSection === 'tags'        && <TagManager />}
           {activeSection === 'export'      && <DataExport />}

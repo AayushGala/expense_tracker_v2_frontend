@@ -12,6 +12,7 @@ const initialState = {
   entries: [],
   receivables: [],
   budgets: [],
+  accountTypes: [],
   settings: {},
   isLoading: true,
   error: null,
@@ -34,6 +35,7 @@ const UPDATE_CATEGORY     = 'UPDATE_CATEGORY';
 const DELETE_CATEGORY     = 'DELETE_CATEGORY';
 const ADD_RECEIVABLE      = 'ADD_RECEIVABLE';
 const UPDATE_RECEIVABLE   = 'UPDATE_RECEIVABLE';
+const SET_ACCOUNT_TYPES   = 'SET_ACCOUNT_TYPES';
 const SET_SETTINGS        = 'SET_SETTINGS';
 
 // ---------------------------------------------------------------------------
@@ -51,6 +53,7 @@ function dataReducer(state, action) {
       return {
         ...state,
         ...rest,
+        accountTypes: state.accountTypes,
         settings: settingsObj,
         isLoading: false,
         error: null,
@@ -141,6 +144,11 @@ function dataReducer(state, action) {
         receivables: state.receivables.map((r) => (r.id === id ? { ...r, ...data } : r)),
       };
     }
+
+    // --- Account Types ---
+
+    case SET_ACCOUNT_TYPES:
+      return { ...state, accountTypes: action.payload };
 
     // --- Settings ---
 
@@ -236,11 +244,6 @@ export function DataProvider({ children }) {
     await loadData();
   }, [loadData]);
 
-  // Auto-load data on mount
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
   // ---------------------------------------------------------------------------
   // Transactions
   // ---------------------------------------------------------------------------
@@ -327,6 +330,57 @@ export function DataProvider({ children }) {
   }, []);
 
   // ---------------------------------------------------------------------------
+  // Account Types & Sub-Types
+  // ---------------------------------------------------------------------------
+
+  const loadAccountTypes = useCallback(async () => {
+    try {
+      const data = await api.getAccountTypes();
+      // Handle both paginated ({ results: [...] }) and plain array responses
+      const list = Array.isArray(data) ? data : (data.results ?? []);
+      dispatch({ type: SET_ACCOUNT_TYPES, payload: list });
+    } catch (err) {
+      console.error('DataContext: loadAccountTypes failed', err);
+    }
+  }, []);
+
+  const addAccountType = useCallback(async (data) => {
+    await api.createAccountType(data);
+    await loadAccountTypes();
+  }, [loadAccountTypes]);
+
+  const updateAccountType = useCallback(async (id, data) => {
+    await api.updateAccountType(id, data);
+    await loadAccountTypes();
+  }, [loadAccountTypes]);
+
+  const deleteAccountType = useCallback(async (id) => {
+    await api.deleteAccountType(id);
+    await loadAccountTypes();
+  }, [loadAccountTypes]);
+
+  const addAccountSubType = useCallback(async (data) => {
+    await api.createAccountSubType(data);
+    await loadAccountTypes();
+  }, [loadAccountTypes]);
+
+  const updateAccountSubType = useCallback(async (id, data) => {
+    await api.updateAccountSubType(id, data);
+    await loadAccountTypes();
+  }, [loadAccountTypes]);
+
+  const deleteAccountSubType = useCallback(async (id) => {
+    await api.deleteAccountSubType(id);
+    await loadAccountTypes();
+  }, [loadAccountTypes]);
+
+  // Auto-load data on mount
+  useEffect(() => {
+    loadData();
+    loadAccountTypes();
+  }, [loadData, loadAccountTypes]);
+
+  // ---------------------------------------------------------------------------
   // Settings
   // ---------------------------------------------------------------------------
 
@@ -357,6 +411,12 @@ export function DataProvider({ children }) {
     updateCategory,
     deleteCategory,
     updateReceivable,
+    addAccountType,
+    updateAccountType,
+    deleteAccountType,
+    addAccountSubType,
+    updateAccountSubType,
+    deleteAccountSubType,
     updateSettings,
   };
 
