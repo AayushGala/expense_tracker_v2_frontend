@@ -65,54 +65,56 @@ export default function DataExport() {
     downloadBlob(blob, `transactions-${timestamp()}.csv`);
   }
 
-  return (
-    <div className="space-y-5">
-      <p className="text-sm text-gray-400">
-        Download a copy of your data. No data is sent externally — the file is generated entirely in your browser.
-      </p>
+  const btnClass =
+    'shrink-0 text-sm px-5 py-2.5 min-w-[160px] justify-center bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 flex items-center gap-2 transition-colors';
 
-      <Card className="p-5 space-y-5">
-        {/* JSON */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-bold text-gray-900">Full Export (JSON)</p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              All data: accounts, categories, transactions, entries, receivables, budgets and settings.
-            </p>
-          </div>
-          <button
-            onClick={handleExportJSON}
-            className="shrink-0 text-sm px-5 py-2.5 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 flex items-center gap-2 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
-            </svg>
-            Export JSON
-          </button>
+  return (
+    <div className="space-y-6">
+      <Card className="p-5">
+        <div className="pb-3 border-b border-gray-100">
+          <h3 className="text-base font-bold text-gray-800">Data Export</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            Download a copy of your data. The file is generated entirely in your browser.
+          </p>
         </div>
 
-        <div className="h-px bg-gray-100" />
-
-        {/* CSV */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-bold text-gray-900">Transactions (CSV)</p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Transactions only — compatible with spreadsheet apps.
-              {transactions.length > 0 && (
-                <> Includes {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}.</>
-              )}
-            </p>
+        <div className="mt-4 space-y-5">
+          {/* JSON */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-[13px] font-medium text-gray-700">Full Export (JSON)</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                All data: accounts, categories, transactions, entries, receivables, budgets and settings.
+              </p>
+            </div>
+            <button onClick={handleExportJSON} className={btnClass}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+              </svg>
+              Export JSON
+            </button>
           </div>
-          <button
-            onClick={handleExportCSV}
-            className="shrink-0 text-sm px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 flex items-center gap-2 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
-            </svg>
-            Export CSV
-          </button>
+
+          <div className="h-px bg-gray-50" />
+
+          {/* CSV */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-[13px] font-medium text-gray-700">Transactions (CSV)</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Transactions only — compatible with spreadsheet apps.
+                {transactions.length > 0 && (
+                  <> Includes {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}.</>
+                )}
+              </p>
+            </div>
+            <button onClick={handleExportCSV} className={btnClass}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
         </div>
       </Card>
     </div>
