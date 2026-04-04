@@ -147,181 +147,6 @@ function AccountLedger({ account, ledger }) {
 }
 
 // ---------------------------------------------------------------------------
-// AccountForm — add new account (inside a modal)
-// ---------------------------------------------------------------------------
-
-function AccountForm({ onSubmit, onCancel, isSaving, ownerOptions, accountTypes }) {
-  const firstType = accountTypes[0];
-  const firstSub = firstType?.sub_types?.[0];
-
-  const [form, setForm] = useState({
-    name: '',
-    type_id: firstType ? String(firstType.id) : '',
-    sub_type_id: firstSub ? String(firstSub.id) : '',
-    currency: 'INR',
-    owner: '',
-  });
-  const [error, setError] = useState('');
-
-  const selectedType = accountTypes.find((t) => String(t.id) === form.type_id);
-  const subTypeOptions = selectedType?.sub_types ?? [];
-
-  function handleChange(field, value) {
-    setForm((prev) => {
-      const next = { ...prev, [field]: value };
-      // Auto-select first sub_type when type changes
-      if (field === 'type_id') {
-        const subs = accountTypes.find((t) => String(t.id) === value)?.sub_types ?? [];
-        next.sub_type_id = subs.length > 0 ? String(subs[0].id) : '';
-      }
-      return next;
-    });
-    if (error) setError('');
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!form.name.trim()) {
-      setError('Account name is required.');
-      return;
-    }
-    const payload = {
-      name: form.name,
-      type: Number(form.type_id),
-      currency: form.currency,
-      owner: form.owner,
-    };
-    if (form.sub_type_id) payload.sub_type = Number(form.sub_type_id);
-    onSubmit(payload);
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      {/* Name */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="acc-name">
-          Account Name <span className="text-red-500">*</span>
-        </label>
-        <input
-          id="acc-name"
-          type="text"
-          value={form.name}
-          onChange={(e) => handleChange('name', e.target.value)}
-          placeholder="e.g. HDFC Savings"
-          autoFocus
-          className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm
-                     text-gray-700 shadow-sm placeholder-gray-400 focus:border-teal-400
-                     focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        />
-      </div>
-
-      {/* Type */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="acc-type">
-          Account Type
-        </label>
-        <select
-          id="acc-type"
-          value={form.type_id}
-          onChange={(e) => handleChange('type_id', e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm
-                     text-gray-700 shadow-sm focus:border-teal-500 focus:outline-none
-                     focus:ring-2 focus:ring-teal-500/30"
-        >
-          {accountTypes.map((t) => (
-            <option key={t.id} value={String(t.id)}>{t.label}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Sub-type */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="acc-subtype">
-          Sub-Type
-        </label>
-        <select
-          id="acc-subtype"
-          value={form.sub_type_id}
-          onChange={(e) => handleChange('sub_type_id', e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm
-                     text-gray-700 shadow-sm focus:border-teal-500 focus:outline-none
-                     focus:ring-2 focus:ring-teal-500/30"
-        >
-          {subTypeOptions.map((s) => (
-            <option key={s.id} value={String(s.id)}>{s.label}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Owner */}
-      {ownerOptions.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="acc-owner">
-            Owner
-          </label>
-          <select
-            id="acc-owner"
-            value={form.owner}
-            onChange={(e) => handleChange('owner', e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm
-                       text-gray-700 shadow-sm focus:border-teal-500 focus:outline-none
-                       focus:ring-2 focus:ring-teal-500/30"
-          >
-            <option value="">None (shared)</option>
-            {ownerOptions.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* Currency */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="acc-currency">
-          Currency
-        </label>
-        <input
-          id="acc-currency"
-          type="text"
-          value={form.currency}
-          onChange={(e) => handleChange('currency', e.target.value.toUpperCase())}
-          maxLength={3}
-          className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm
-                     text-gray-700 shadow-sm focus:border-teal-500 focus:outline-none
-                     focus:ring-2 focus:ring-teal-500/30"
-        />
-      </div>
-
-      {/* Error */}
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
-
-      {/* Actions */}
-      <div className="flex gap-3 pt-1">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium
-                     text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="flex-1 rounded-xl bg-teal-600 py-2.5 text-sm font-bold text-white
-                     shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2
-                     focus:ring-teal-500/50 transition-colors disabled:opacity-60"
-        >
-          {isSaving ? 'Saving…' : 'Add Account'}
-        </button>
-      </div>
-    </form>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // AccountCard — single account tile
 // ---------------------------------------------------------------------------
 
@@ -429,12 +254,10 @@ function AccountSection({ title, accounts, getBalance, onAccountClick, balanceSu
 // ---------------------------------------------------------------------------
 
 export default function AccountsPage() {
-  const { isLoading, addAccount, accountTypes } = useData();
+  const { isLoading } = useData();
   const { accountsByType, getAccountBalance, getAccountLedger } = useAccounts();
   const { owners, ownerOptions } = useOwners();
 
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [ledgerAccount, setLedgerAccount] = useState(null); // account object | null
   const [ownerFilter, setOwnerFilter] = useState('');
 
@@ -484,21 +307,6 @@ export default function AccountsPage() {
     setLedgerAccount(account);
   }
 
-  async function handleAddAccount(formData) {
-    setIsSaving(true);
-    try {
-      await addAccount({
-        ...formData,
-        is_active: true,
-      });
-      setShowAddModal(false);
-    } catch (err) {
-      console.error('AccountsPage: addAccount failed', err);
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
   // -------------------------------------------------------------------------
 
   if (isLoading) {
@@ -526,26 +334,6 @@ export default function AccountsPage() {
               className="min-w-[130px]"
             />
           )}
-          <button
-          onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-4 py-2.5 min-h-[44px]
-                     text-sm font-bold text-white shadow-sm hover:bg-teal-700
-                     focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Add Account
-        </button>
         </div>
       </div>
 
@@ -593,22 +381,6 @@ export default function AccountsPage() {
           balanceSummary={sectionTotals[key]}
         />
       ))}
-
-      {/* Add Account modal */}
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        title="Add Account"
-        maxWidth="max-w-md"
-      >
-        <AccountForm
-          onSubmit={handleAddAccount}
-          onCancel={() => setShowAddModal(false)}
-          isSaving={isSaving}
-          ownerOptions={owners}
-          accountTypes={accountTypes}
-        />
-      </Modal>
 
       {/* Account Ledger modal */}
       <Modal
