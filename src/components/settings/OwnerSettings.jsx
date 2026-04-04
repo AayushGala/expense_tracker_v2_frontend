@@ -46,13 +46,13 @@ export default function OwnerSettings() {
   return (
     <div className="space-y-6">
       <Card className="p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">
-          Account Owners
-        </p>
-        <p className="text-xs text-gray-400 mb-4">
-          Add the people sharing this tracker. These names will appear in owner
-          dropdowns across accounts, transactions, and reports.
-        </p>
+        <div className="pb-3 border-b border-gray-100 mb-4">
+          <h3 className="text-base font-bold text-gray-800">Account Owners</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            Add the people sharing this tracker. These names will appear in owner
+            dropdowns across accounts, transactions, and reports.
+          </p>
+        </div>
 
         <div className="flex flex-col gap-3">
           {names.map((name, index) => (

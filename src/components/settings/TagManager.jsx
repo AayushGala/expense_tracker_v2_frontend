@@ -32,24 +32,21 @@ export default function TagManager() {
   }, [transactions]);
 
   return (
-    <div className="space-y-5">
-      <p className="text-sm text-gray-400">
-        Tags are derived automatically from your transactions. Edit tags directly on each transaction.
-      </p>
-
+    <div className="space-y-6">
       <Card className="p-5">
+        <div className="pb-3 border-b border-gray-100">
+          <h3 className="text-base font-bold text-gray-800">Tags</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            Tags are derived automatically from your transactions.
+          </p>
+        </div>
         {tags.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">
+          <p className="text-sm text-gray-400 py-4 mt-2">
             No tags found. Add tags to transactions using comma-separated values.
           </p>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-                All Tags
-              </p>
-              <span className="text-[11px] text-gray-400 font-medium">{tags.length} unique</span>
-            </div>
+            <div className="mt-3"></div>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <div

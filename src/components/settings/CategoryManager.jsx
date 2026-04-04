@@ -25,7 +25,7 @@ function SubCategoryRow({ category, onEdit, onDelete }) {
   }
 
   return (
-    <div className="flex items-center gap-2 py-2.5 pl-6 group">
+    <div className="flex items-center gap-2 py-2.5 group">
       {editing ? (
         <>
           <input
@@ -53,7 +53,7 @@ function SubCategoryRow({ category, onEdit, onDelete }) {
         </>
       ) : (
         <>
-          <span className="flex-1 text-sm font-medium text-gray-500">{category.name}</span>
+          <span className="flex-1 text-[13px] text-gray-500">{category.name}</span>
           <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setEditing(true)}
@@ -125,7 +125,7 @@ function CategoryRow({ category, onEdit, onDelete, onAddSub, onEditSub, onDelete
   const children = category.children ?? [];
 
   return (
-    <div className="py-3">
+    <div className="py-2.5">
       {/* Parent row */}
       <div className="flex items-center gap-2 group">
         {editing ? (
@@ -155,7 +155,7 @@ function CategoryRow({ category, onEdit, onDelete, onAddSub, onEditSub, onDelete
           </>
         ) : (
           <>
-            <span className="flex-1 text-sm font-medium text-gray-700">{category.name}</span>
+            <span className="flex-1 text-[13px] font-medium text-gray-700">{category.name}</span>
             {children.length > 0 && (
               <span className="text-[11px] text-gray-400 font-medium">{children.length} sub</span>
             )}
@@ -210,7 +210,7 @@ function CategoryRow({ category, onEdit, onDelete, onAddSub, onEditSub, onDelete
 
       {/* Add subcategory */}
       {addingSub ? (
-        <div className="mt-2 pl-6 flex gap-2">
+        <div className="mt-2 flex gap-2">
           <input
             autoFocus
             value={newSubName}
@@ -236,7 +236,7 @@ function CategoryRow({ category, onEdit, onDelete, onAddSub, onEditSub, onDelete
       ) : (
         <button
           onClick={() => setAddingSub(true)}
-          className="mt-1 ml-6 text-xs text-teal-600 hover:text-teal-700 font-semibold hover:bg-teal-50 px-3 py-1.5 rounded-lg transition-colors"
+          className="mt-1 text-xs text-teal-600 hover:text-teal-700 font-semibold hover:bg-teal-50 px-2 py-1.5 -ml-2 rounded-lg transition-colors"
         >
           + Add Subcategory
         </button>
@@ -324,27 +324,31 @@ export default function CategoryManager() {
       {/* Grouped lists */}
       {TYPE_OPTIONS.map((type) => (
         <Card key={type} className="p-5">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 capitalize">{type}</p>
-            <span className="text-[11px] text-gray-400 font-medium">{grouped[type].length} items</span>
+          <div className="pb-3 border-b border-gray-100">
+            <h3 className="text-base font-bold text-gray-800 capitalize">{type}</h3>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {grouped[type].length} {grouped[type].length === 1 ? 'category' : 'categories'}
+            </p>
           </div>
-          {grouped[type].length === 0 ? (
-            <p className="text-sm text-gray-400 py-4 text-center">No {type} categories yet.</p>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {grouped[type].map((cat) => (
-                <CategoryRow
-                  key={cat.id}
-                  category={cat}
-                  onEdit={updateCategory}
-                  onDelete={deleteCategory}
-                  onAddSub={addCategory}
-                  onEditSub={updateCategory}
-                  onDeleteSub={deleteCategory}
-                />
-              ))}
-            </div>
-          )}
+          <div className="mt-2">
+            {grouped[type].length === 0 ? (
+              <p className="text-sm text-gray-400 py-3">No {type} categories yet.</p>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {grouped[type].map((cat) => (
+                  <CategoryRow
+                    key={cat.id}
+                    category={cat}
+                    onEdit={updateCategory}
+                    onDelete={deleteCategory}
+                    onAddSub={addCategory}
+                    onEditSub={updateCategory}
+                    onDeleteSub={deleteCategory}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </Card>
       ))}
     </div>
