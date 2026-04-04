@@ -201,15 +201,22 @@ function transformBudget(b) {
   };
 }
 
-function transformAccount(a) {
+/**
+ * Normalize account from API: map integer FK ids to string names
+ * so display, grouping, and accounting logic work with string types.
+ * @param {Object} a - raw account from API
+ * @param {Map} typeNameMap - Map of typeId -> name (e.g. 1 -> "asset")
+ * @param {Map} subTypeNameMap - Map of subTypeId -> name (e.g. 3 -> "credit_card")
+ */
+function transformAccount(a, typeNameMap, subTypeNameMap) {
   return {
     ...a,
     // Keep the raw FK id so forms can reference it
     type_id: a.type,
     sub_type_id: a.sub_type,
     // Normalize type/sub_type to string names for display and accounting logic
-    type: a.type_name ?? a.type,
-    sub_type: a.sub_type_name ?? a.sub_type,
+    type: typeNameMap?.get(a.type) ?? a.type_name ?? a.type,
+    sub_type: subTypeNameMap?.get(a.sub_type) ?? a.sub_type_name ?? a.sub_type,
   };
 }
 
@@ -234,10 +241,26 @@ export function DataProvider({ children }) {
     dispatch({ type: SET_LOADING, payload: true });
     try {
       const data = await api.getAllData();
+
+      // Build lookup maps from account_types so we can resolve FK ids to names
+      const accountTypes = data.account_types ?? [];
+      const typeNameMap = new Map();
+      const subTypeNameMap = new Map();
+      for (const at of accountTypes) {
+        typeNameMap.set(at.id, at.name);
+        for (const st of (at.sub_types ?? [])) {
+          subTypeNameMap.set(st.id, st.name);
+        }
+      }
+
+      // Also set accountTypes from the same response
+      const atList = Array.isArray(accountTypes) ? accountTypes : (accountTypes.results ?? []);
+      dispatch({ type: SET_ACCOUNT_TYPES, payload: atList });
+
       dispatch({
         type: SET_DATA,
         payload: {
-          accounts: (data.accounts ?? []).map(transformAccount),
+          accounts: (data.accounts ?? []).map((a) => transformAccount(a, typeNameMap, subTypeNameMap)),
           categories: data.categories ?? [],
           transactions: (data.transactions ?? []).map(transformTransaction),
           entries: (data.entries ?? []).map(transformEntry),
@@ -298,17 +321,30 @@ export function DataProvider({ children }) {
   // Accounts
   // ---------------------------------------------------------------------------
 
+  // Build lookup maps from current accountTypes state
+  const { typeNameMap, subTypeNameMap } = (() => {
+    const tMap = new Map();
+    const sMap = new Map();
+    for (const at of state.accountTypes) {
+      tMap.set(at.id, at.name);
+      for (const st of (at.sub_types ?? [])) {
+        sMap.set(st.id, st.name);
+      }
+    }
+    return { typeNameMap: tMap, subTypeNameMap: sMap };
+  })();
+
   const addAccount = useCallback(async (accountData) => {
     const result = await api.createAccount(accountData);
-    dispatch({ type: ADD_ACCOUNT, payload: transformAccount(result) });
+    dispatch({ type: ADD_ACCOUNT, payload: transformAccount(result, typeNameMap, subTypeNameMap) });
     return result;
-  }, []);
+  }, [typeNameMap, subTypeNameMap]);
 
   const updateAccount = useCallback(async (id, data) => {
     const result = await api.updateAccount(id, data);
-    dispatch({ type: UPDATE_ACCOUNT, payload: { id, data: transformAccount(result) } });
+    dispatch({ type: UPDATE_ACCOUNT, payload: { id, data: transformAccount(result, typeNameMap, subTypeNameMap) } });
     return result;
-  }, []);
+  }, [typeNameMap, subTypeNameMap]);
 
   // ---------------------------------------------------------------------------
   // Categories
