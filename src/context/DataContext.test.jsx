@@ -57,7 +57,9 @@ describe('DataContext', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.accounts).toEqual(MOCK_ALL_DATA.accounts);
+    expect(result.current.accounts).toHaveLength(MOCK_ALL_DATA.accounts.length);
+    expect(result.current.accounts[0].name).toBe('HDFC Savings');
+    expect(result.current.accounts[0].type_id).toBe('asset'); // raw FK preserved
     expect(result.current.categories).toEqual(MOCK_ALL_DATA.categories);
     expect(result.current.accountTypes).toEqual(MOCK_ACCOUNT_TYPES);
     expect(mockApi.getAllData).toHaveBeenCalledTimes(1);
@@ -116,7 +118,7 @@ describe('DataContext', () => {
 
     // Should fall back to empty array, not crash
     expect(result.current.accountTypes).toEqual([]);
-    expect(result.current.accounts).toEqual(MOCK_ALL_DATA.accounts);
+    expect(result.current.accounts).toHaveLength(MOCK_ALL_DATA.accounts.length);
 
     consoleSpy.mockRestore();
   });

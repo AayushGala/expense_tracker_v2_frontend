@@ -201,6 +201,18 @@ function transformBudget(b) {
   };
 }
 
+function transformAccount(a) {
+  return {
+    ...a,
+    // Keep the raw FK id so forms can reference it
+    type_id: a.type,
+    sub_type_id: a.sub_type,
+    // Normalize type/sub_type to string names for display and accounting logic
+    type: a.type_name ?? a.type,
+    sub_type: a.sub_type_name ?? a.sub_type,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
@@ -225,7 +237,7 @@ export function DataProvider({ children }) {
       dispatch({
         type: SET_DATA,
         payload: {
-          accounts: data.accounts ?? [],
+          accounts: (data.accounts ?? []).map(transformAccount),
           categories: data.categories ?? [],
           transactions: (data.transactions ?? []).map(transformTransaction),
           entries: (data.entries ?? []).map(transformEntry),
@@ -288,13 +300,13 @@ export function DataProvider({ children }) {
 
   const addAccount = useCallback(async (accountData) => {
     const result = await api.createAccount(accountData);
-    dispatch({ type: ADD_ACCOUNT, payload: result });
+    dispatch({ type: ADD_ACCOUNT, payload: transformAccount(result) });
     return result;
   }, []);
 
   const updateAccount = useCallback(async (id, data) => {
     const result = await api.updateAccount(id, data);
-    dispatch({ type: UPDATE_ACCOUNT, payload: { id, data: result } });
+    dispatch({ type: UPDATE_ACCOUNT, payload: { id, data: transformAccount(result) } });
     return result;
   }, []);
 

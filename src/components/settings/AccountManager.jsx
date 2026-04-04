@@ -124,22 +124,22 @@ export default function AccountManager() {
   const { owners } = useOwners();
 
   const [newName, setNewName]       = useState('');
-  const [newType, setNewType]       = useState('');
-  const [newSubType, setNewSubType] = useState('');
+  const [newTypeId, setNewTypeId]   = useState('');
+  const [newSubTypeId, setNewSubTypeId] = useState('');
   const [adding, setAdding]         = useState(false);
   const [error, setError]           = useState('');
 
   // Set defaults once account types are loaded
   useEffect(() => {
-    if (accountTypes.length > 0 && !newType) {
+    if (accountTypes.length > 0 && !newTypeId) {
       const first = accountTypes[0];
-      setNewType(first.name);
+      setNewTypeId(String(first.id));
       const subs = first.sub_types ?? [];
-      if (subs.length > 0) setNewSubType(subs[0].name);
+      if (subs.length > 0) setNewSubTypeId(String(subs[0].id));
     }
-  }, [accountTypes, newType]);
+  }, [accountTypes, newTypeId]);
 
-  const selectedAccountType = accountTypes.find((t) => t.name === newType);
+  const selectedAccountType = accountTypes.find((t) => String(t.id) === newTypeId);
   const subTypeOptions = selectedAccountType?.sub_types ?? [];
 
   const accountsWithEntries = new Set(entries.map((e) => e.account_id));
@@ -149,13 +149,14 @@ export default function AccountManager() {
     if (!trimmed) { setError('Name is required.'); return; }
     setError('');
     setAdding(true);
-    await addAccount({
+    const payload = {
       name: trimmed,
-      type: newType,
-      sub_type: newSubType,
+      type: Number(newTypeId),
       currency: 'INR',
       is_active: true,
-    });
+    };
+    if (newSubTypeId) payload.sub_type = Number(newSubTypeId);
+    await addAccount(payload);
     setNewName('');
     setAdding(false);
   }
@@ -176,20 +177,20 @@ export default function AccountManager() {
             className={`flex-1 min-w-0 ${inputClass}`}
           />
           <Dropdown
-            value={newType}
+            value={newTypeId}
             onChange={(val) => {
-              setNewType(val);
-              const subs = accountTypes.find((t) => t.name === val)?.sub_types ?? [];
-              setNewSubType(subs.length > 0 ? subs[0].name : '');
+              setNewTypeId(val);
+              const subs = accountTypes.find((t) => String(t.id) === val)?.sub_types ?? [];
+              setNewSubTypeId(subs.length > 0 ? String(subs[0].id) : '');
             }}
-            options={accountTypes.map((t) => ({ value: t.name, label: t.label }))}
+            options={accountTypes.map((t) => ({ value: String(t.id), label: t.label }))}
             className="min-w-[130px]"
           />
           {subTypeOptions.length > 0 && (
             <Dropdown
-              value={newSubType}
-              onChange={setNewSubType}
-              options={subTypeOptions.map((s) => ({ value: s.name, label: s.label }))}
+              value={newSubTypeId}
+              onChange={setNewSubTypeId}
+              options={subTypeOptions.map((s) => ({ value: String(s.id), label: s.label }))}
               className="min-w-[130px]"
             />
           )}
