@@ -184,7 +184,7 @@ describe('DataContext', () => {
     expect(result.current.categories).toHaveLength(MOCK_ALL_DATA.categories.length + 1);
   });
 
-  it('deletes a category', async () => {
+  it('deletes a category and reloads data', async () => {
     const { result } = renderHook(() => useData(), { wrapper });
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -193,7 +193,8 @@ describe('DataContext', () => {
     });
 
     expect(mockApi.deleteCategory).toHaveBeenCalledWith(1);
-    expect(result.current.categories).toHaveLength(MOCK_ALL_DATA.categories.length - 1);
+    // Should reload all data to pick up orphaned children
+    expect(mockApi.getAllData).toHaveBeenCalledTimes(2); // initial + reload
   });
 
   // -----------------------------------------------------------------------

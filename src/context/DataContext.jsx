@@ -316,8 +316,9 @@ export function DataProvider({ children }) {
 
   const deleteCategory = useCallback(async (id) => {
     await api.deleteCategory(id);
-    dispatch({ type: DELETE_CATEGORY, payload: id });
-  }, []);
+    // Reload all data so orphaned children (parent set to null) are updated
+    await loadData();
+  }, [loadData]);
 
   // ---------------------------------------------------------------------------
   // Receivables
