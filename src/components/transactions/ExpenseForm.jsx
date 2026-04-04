@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 const PREDEFINED_BENEFICIARIES = ['self', 'family'];
 
@@ -108,16 +109,12 @@ export default function ExpenseForm({ onSubmit }) {
 
         <div>
           <label className={labelClass}>Paid From</label>
-          <select
+          <Select
             value={fromAccountId}
             onChange={(e) => handleFromAccountChange(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select account</option>
-            {payableAccounts.map((a) => (
-              <option key={a.id} value={a.id}>{a.name}</option>
-            ))}
-          </select>
+            options={payableAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            placeholder="Select account"
+          />
           {errors.fromAccountId && <p className={errorClass}>{errors.fromAccountId}</p>}
         </div>
       </div>
@@ -126,33 +123,28 @@ export default function ExpenseForm({ onSubmit }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Category</label>
-          <select
+          <Select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select category</option>
-            {expenseCategories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            options={expenseCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+            placeholder="Select category"
+          />
           {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
         </div>
 
         <div>
           <label className={labelClass}>Beneficiary</label>
-          <select
+          <Select
             value={beneficiaryType}
             onChange={(e) => setBeneficiaryType(e.target.value)}
-            className={inputClass}
-          >
-            {PREDEFINED_BENEFICIARIES.map((b) => (
-              <option key={b} value={b}>
-                {b.charAt(0).toUpperCase() + b.slice(1)}
-              </option>
-            ))}
-            <option value="custom">Other (custom)</option>
-          </select>
+            options={[
+              ...PREDEFINED_BENEFICIARIES.map((b) => ({
+                value: b,
+                label: b.charAt(0).toUpperCase() + b.slice(1),
+              })),
+              { value: 'custom', label: 'Other (custom)' },
+            ]}
+          />
           {beneficiaryType === 'custom' && (
             <div className="mt-2">
               <input
@@ -174,12 +166,12 @@ export default function ExpenseForm({ onSubmit }) {
       {owners.length > 0 && (
         <div>
           <label className={labelClass}>Owner</label>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-            <option value="">Unassigned</option>
-            {owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
+          <Select
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+            options={owners.map((o) => ({ value: o, label: o }))}
+            placeholder="Unassigned"
+          />
         </div>
       )}
 

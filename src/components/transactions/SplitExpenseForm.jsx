@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 /**
  * Form for recording a split expense.
@@ -171,21 +172,15 @@ export default function SplitExpenseForm({ onSubmit }) {
       {/* Paying Account */}
       <div>
         <label className={labelClass}>Paying Account</label>
-        <select
+        <Select
           value={fromAccountId}
           onChange={(e) => {
             setFromAccountId(e.target.value);
             setOwner(getAccountOwner(e.target.value));
           }}
-          className={inputClass}
-        >
-          <option value="">Select account</option>
-          {payableAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={payableAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select account"
+        />
         {errors.fromAccountId && (
           <p className={errorClass}>{errors.fromAccountId}</p>
         )}
@@ -194,18 +189,12 @@ export default function SplitExpenseForm({ onSubmit }) {
       {/* Category */}
       <div>
         <label className={labelClass}>Expense Category</label>
-        <select
+        <Select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select category</option>
-          {expenseCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          options={expenseCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+          placeholder="Select category"
+        />
         {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
       </div>
 
@@ -287,12 +276,12 @@ export default function SplitExpenseForm({ onSubmit }) {
       {owners.length > 0 && (
         <div>
           <label className={labelClass}>Owner</label>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-            <option value="">Unassigned</option>
-            {owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
+          <Select
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+            options={owners.map((o) => ({ value: o, label: o }))}
+            placeholder="Unassigned"
+          />
         </div>
       )}
 

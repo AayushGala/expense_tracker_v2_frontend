@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 /**
  * Form for recording an income transaction.
@@ -96,36 +97,24 @@ export default function IncomeForm({ onSubmit }) {
       {/* To Account */}
       <div>
         <label className={labelClass}>Received Into</label>
-        <select
+        <Select
           value={toAccountId}
           onChange={(e) => handleToAccountChange(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select account</option>
-          {assetAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={assetAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select account"
+        />
         {errors.toAccountId && <p className={errorClass}>{errors.toAccountId}</p>}
       </div>
 
       {/* Category */}
       <div>
         <label className={labelClass}>Income Category</label>
-        <select
+        <Select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select category</option>
-          {incomeCategories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          options={incomeCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+          placeholder="Select category"
+        />
         {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
       </div>
 
@@ -133,12 +122,12 @@ export default function IncomeForm({ onSubmit }) {
       {owners.length > 0 && (
         <div>
           <label className={labelClass}>Owner</label>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-            <option value="">Unassigned</option>
-            {owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
+          <Select
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+            options={owners.map((o) => ({ value: o, label: o }))}
+            placeholder="Unassigned"
+          />
         </div>
       )}
 

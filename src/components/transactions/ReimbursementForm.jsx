@@ -3,6 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import { formatINR } from '../../utils/formatters';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 /**
  * Form for recording reimbursement received from someone.
@@ -103,25 +104,19 @@ export default function ReimbursementForm({ onSubmit }) {
           {/* Select Person / Receivable */}
           <div>
             <label className={labelClass}>Select Receivable</label>
-            <select
+            <Select
               value={selectedReceivableId}
               onChange={(e) => {
                 setSelectedReceivableId(e.target.value);
                 setAmount('');
                 setErrors({});
               }}
-              className={inputClass}
-            >
-              <option value="">Choose a person</option>
-              {pendingReceivables.map((r) => {
+              options={pendingReceivables.map((r) => {
                 const owed = (r.amount_owed ?? 0) - (r.amount_settled ?? 0);
-                return (
-                  <option key={r.id} value={r.id}>
-                    {r.person_name} — {formatINR(owed)} outstanding
-                  </option>
-                );
+                return { value: String(r.id), label: `${r.person_name} — ${formatINR(owed)} outstanding` };
               })}
-            </select>
+              placeholder="Choose a person"
+            />
             {errors.receivable && (
               <p className={errorClass}>{errors.receivable}</p>
             )}
@@ -171,21 +166,15 @@ export default function ReimbursementForm({ onSubmit }) {
           {/* To Account */}
           <div>
             <label className={labelClass}>Received Into</label>
-            <select
+            <Select
               value={toAccountId}
               onChange={(e) => {
                 setToAccountId(e.target.value);
                 setOwner(getAccountOwner(e.target.value));
               }}
-              className={inputClass}
-            >
-              <option value="">Select account</option>
-              {assetAccounts.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
+              options={assetAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+              placeholder="Select account"
+            />
             {errors.toAccountId && (
               <p className={errorClass}>{errors.toAccountId}</p>
             )}
@@ -195,12 +184,12 @@ export default function ReimbursementForm({ onSubmit }) {
           {owners.length > 0 && (
             <div>
               <label className={labelClass}>Owner</label>
-              <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-                <option value="">Unassigned</option>
-                {owners.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </select>
+              <Select
+                value={owner}
+                onChange={(e) => setOwner(e.target.value)}
+                options={owners.map((o) => ({ value: o, label: o }))}
+                placeholder="Unassigned"
+              />
             </div>
           )}
 

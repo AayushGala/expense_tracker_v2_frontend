@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 /**
  * Form for recording cashback received into an account.
@@ -113,18 +114,12 @@ export default function CashbackForm({ onSubmit }) {
       {/* Account */}
       <div>
         <label className={labelClass}>Account Receiving Cashback</label>
-        <select
+        <Select
           value={accountId}
           onChange={(e) => handleAccountChange(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select account</option>
-          {assetAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={assetAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select account"
+        />
         {errors.accountId && <p className={errorClass}>{errors.accountId}</p>}
       </div>
 
@@ -132,12 +127,12 @@ export default function CashbackForm({ onSubmit }) {
       {owners.length > 0 && (
         <div>
           <label className={labelClass}>Owner</label>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-            <option value="">Unassigned</option>
-            {owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
+          <Select
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+            options={owners.map((o) => ({ value: o, label: o }))}
+            placeholder="Unassigned"
+          />
         </div>
       )}
 

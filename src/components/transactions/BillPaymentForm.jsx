@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 /**
  * Form for recording a bill payment (asset account pays off a liability).
@@ -96,18 +97,12 @@ export default function BillPaymentForm({ onSubmit }) {
       {/* From Account (Bank / Asset) */}
       <div>
         <label className={labelClass}>Paid From (Bank / Asset Account)</label>
-        <select
+        <Select
           value={fromAccountId}
           onChange={(e) => handleFromAccountChange(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select bank account</option>
-          {bankAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={bankAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select bank account"
+        />
         {errors.fromAccountId && (
           <p className={errorClass}>{errors.fromAccountId}</p>
         )}
@@ -116,18 +111,12 @@ export default function BillPaymentForm({ onSubmit }) {
       {/* To Account (Credit Card / Liability) */}
       <div>
         <label className={labelClass}>Paid To (Credit Card / Liability)</label>
-        <select
+        <Select
           value={toAccountId}
           onChange={(e) => setToAccountId(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select liability account</option>
-          {liabilityAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={liabilityAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select liability account"
+        />
         {errors.toAccountId && (
           <p className={errorClass}>{errors.toAccountId}</p>
         )}
@@ -137,12 +126,12 @@ export default function BillPaymentForm({ onSubmit }) {
       {owners.length > 0 && (
         <div>
           <label className={labelClass}>Owner</label>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-            <option value="">Unassigned</option>
-            {owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
+          <Select
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+            options={owners.map((o) => ({ value: o, label: o }))}
+            placeholder="Unassigned"
+          />
         </div>
       )}
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
+import Select from '../common/Select';
 
 /**
  * Form for recording a transfer between two asset/liability accounts.
@@ -100,18 +101,12 @@ export default function TransferForm({ onSubmit }) {
       {/* From Account */}
       <div>
         <label className={labelClass}>From Account</label>
-        <select
+        <Select
           value={fromAccountId}
           onChange={(e) => handleFromAccountChange(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select source account</option>
-          {eligibleAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select source account"
+        />
         {errors.fromAccountId && (
           <p className={errorClass}>{errors.fromAccountId}</p>
         )}
@@ -120,18 +115,12 @@ export default function TransferForm({ onSubmit }) {
       {/* To Account */}
       <div>
         <label className={labelClass}>To Account</label>
-        <select
+        <Select
           value={toAccountId}
           onChange={(e) => setToAccountId(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select destination account</option>
-          {eligibleAccounts.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </select>
+          options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+          placeholder="Select destination account"
+        />
         {errors.toAccountId && (
           <p className={errorClass}>{errors.toAccountId}</p>
         )}
@@ -141,12 +130,12 @@ export default function TransferForm({ onSubmit }) {
       {owners.length > 0 && (
         <div>
           <label className={labelClass}>Owner</label>
-          <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputClass}>
-            <option value="">Unassigned</option>
-            {owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
+          <Select
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+            options={owners.map((o) => ({ value: o, label: o }))}
+            placeholder="Unassigned"
+          />
         </div>
       )}
 
