@@ -1,0 +1,54 @@
+import { useState } from 'react';
+import SpendingTrends from '../components/reports/SpendingTrends';
+import CashflowReport from '../components/reports/CashflowReport';
+import CategoryDeepDive from '../components/reports/CategoryDeepDive';
+import AccountHistory from '../components/reports/AccountHistory';
+import ReceivablesReport from '../components/reports/ReceivablesReport';
+
+const TABS = [
+  { id: 'spending',    label: 'Spending Trends' },
+  { id: 'cashflow',   label: 'Cashflow' },
+  { id: 'category',   label: 'Category Deep-Dive' },
+  { id: 'account',    label: 'Account History' },
+  { id: 'receivables',label: 'Receivables' },
+];
+
+export default function ReportsPage() {
+  const [activeTab, setActiveTab] = useState('spending');
+
+  return (
+    <div className="space-y-6">
+      {/* Header — hidden on mobile (TopBar shows title) */}
+      <div className="hidden md:block">
+        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+        <p className="text-sm text-gray-400 mt-1">Analyse your financial data over time.</p>
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex overflow-x-auto scrollbar-none gap-0.5 sm:gap-1 border-b border-gray-200 -mx-4 px-4 md:mx-0 md:px-0">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`whitespace-nowrap px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 -mb-px transition-colors ${
+              activeTab === tab.id
+                ? 'border-teal-600 text-teal-700'
+                : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab panels — negative margin to tighten gap to match inner spacing */}
+      <div className="-mt-2">
+        {activeTab === 'spending'    && <SpendingTrends />}
+        {activeTab === 'cashflow'    && <CashflowReport />}
+        {activeTab === 'category'    && <CategoryDeepDive />}
+        {activeTab === 'account'     && <AccountHistory />}
+        {activeTab === 'receivables' && <ReceivablesReport />}
+      </div>
+    </div>
+  );
+}

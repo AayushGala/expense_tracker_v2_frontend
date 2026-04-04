@@ -1,0 +1,170 @@
+import { useMemo } from 'react';
+import { useData } from '../context/DataContext';
+
+/**
+ * Custom hook for filtering and enriching transactions.
+ *
+ * @param {Object} [filters]
+ * @param {string} [filters.dateFrom]    - ISO date string, inclusive lower bound
+ * @param {string} [filters.dateTo]      - ISO date string, inclusive upper bound
+ * @param {string} [filters.type]        - transaction type (e.g. "expense")
+ * @param {string} [filters.accountId]   - only transactions with an entry on this account
+ * @param {string} [filters.categoryId]  - only transactions with an entry on this category
+ * @param {string} [filters.beneficiary] - match against transaction.beneficiary
+ * @param {string} [filters.owner]      - match against transaction.owner
+ * @param {string} [filters.search]      - free-text search against notes/beneficiary
+ */
+export function useTransactions(filters = {}) {
+  const { transactions, entries, accounts, categories } = useData();
+
+  const { dateFrom, dateTo, type, accountId, categoryId, beneficiary, owner, search } = filters;
+
+  // Build lookup maps once
+  const accountMap = useMemo(
+    () => new Map(accounts.map((a) => [a.id, a])),
+    [accounts]
+  );
+
+  const categoryMap = useMemo(
+    () => new Map(categories.map((c) => [c.id, c])),
+    [categories]
+  );
+
+  // Build a lookup from transactionId → entries[]
+  const entriesByTxn = useMemo(() => {
+    const map = new Map();
+    for (const entry of entries) {
+      if (!map.has(entry.transaction_id)) {
+        map.set(entry.transaction_id, []);
+      }
+      map.get(entry.transaction_id).push(entry);
+    }
+    return map;
+  }, [entries]);
+
+  /**
+   * Returns the entries for a given transaction id.
+   * @param {string} txnId
+   * @returns {Array<Object>}
+   */
+  function getTransactionEntries(txnId) {
+    return entriesByTxn.get(txnId) ?? [];
+  }
+
+  /**
+   * Finds a single transaction by id.
+   * @param {string} id
+   * @returns {Object|undefined}
+   */
+  function getTransactionById(id) {
+    return transactions.find((t) => t.id === id);
+  }
+
+  // Enrich + filter + sort
+  const filteredTransactions = useMemo(() => {
+    const searchLower = search ? search.toLowerCase() : '';
+    const fromMs = dateFrom ? new Date(dateFrom).getTime() : null;
+    const toMs = dateTo ? new Date(dateTo + 'T23:59:59').getTime() : null;
+
+    return transactions
+      .filter((txn) => {
+        // Date range
+        if (fromMs !== null || toMs !== null) {
+          const txnMs = new Date(txn.date).getTime();
+          if (fromMs !== null && txnMs < fromMs) return false;
+          if (toMs !== null && txnMs > toMs) return false;
+        }
+
+        // Transaction type
+        if (type && txn.type !== type) return false;
+
+        // Beneficiary exact match
+        if (beneficiary && txn.beneficiary !== beneficiary) return false;
+
+        // Owner exact match
+        if (owner && txn.owner !== owner) return false;
+
+        // Account / category filter — check entries
+        if (accountId || categoryId) {
+          const txnEntries = entriesByTxn.get(txn.id) ?? [];
+          if (accountId && !txnEntries.some((e) => e.account_id === accountId)) {
+            return false;
+          }
+          if (categoryId && !txnEntries.some((e) => e.account_id === categoryId)) {
+            return false;
+          }
+        }
+
+        // Free-text search
+        if (searchLower) {
+          const noteMatch = txn.notes?.toLowerCase().includes(searchLower) ?? false;
+          const beneficiaryMatch =
+            txn.beneficiary?.toLowerCase().includes(searchLower) ?? false;
+          if (!noteMatch && !beneficiaryMatch) return false;
+        }
+
+        return true;
+      })
+      .map((txn) => {
+        // Enrich with human-readable account and category names from entries
+        const txnEntries = entriesByTxn.get(txn.id) ?? [];
+        const accountNames = [
+          ...new Set(
+            txnEntries
+              .map((e) => accountMap.get(e.account_id)?.name)
+              .filter(Boolean)
+          ),
+        ];
+        const categoryNames = [
+          ...new Set(
+            txnEntries
+              .map((e) => categoryMap.get(e.account_id)?.name)
+              .filter(Boolean)
+          ),
+        ];
+
+        // Compute display amount from entries (not stored on the transaction row).
+        // For expense/split_expense/bill_payment/investment: sum of CREDIT entries on real accounts
+        // For income/cashback/reimbursement: sum of DEBIT entries on real accounts
+        // For transfer: the transfer amount (either leg)
+        let amount = txn.amount; // keep optimistic value if present
+        if (amount === undefined || amount === null || amount === '') {
+          const credits = txnEntries
+            .filter((e) => e.entry_type === 'CREDIT')
+            .reduce((sum, e) => sum + (e.amount || 0), 0);
+          const debits = txnEntries
+            .filter((e) => e.entry_type === 'DEBIT')
+            .reduce((sum, e) => sum + (e.amount || 0), 0);
+          // Use the larger side (they should be equal for balanced entries)
+          amount = Math.max(credits, debits);
+        }
+
+        return {
+          ...txn,
+          amount,
+          accountNames,
+          categoryNames,
+        };
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [
+    transactions,
+    entriesByTxn,
+    accountMap,
+    categoryMap,
+    dateFrom,
+    dateTo,
+    type,
+    accountId,
+    categoryId,
+    beneficiary,
+    owner,
+    search,
+  ]);
+
+  return {
+    filteredTransactions,
+    getTransactionEntries,
+    getTransactionById,
+  };
+}

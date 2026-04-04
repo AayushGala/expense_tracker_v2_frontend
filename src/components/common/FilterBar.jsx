@@ -1,0 +1,125 @@
+import { useData } from '../../context/DataContext';
+import { useOwners } from '../../hooks/useOwners';
+import Dropdown from './Dropdown';
+import CalendarPicker from './CalendarPicker';
+
+const TRANSACTION_TYPES = [
+  { value: '',              label: 'All Types' },
+  { value: 'expense',       label: 'Expense' },
+  { value: 'income',        label: 'Income' },
+  { value: 'transfer',      label: 'Transfer' },
+  { value: 'bill_payment',  label: 'Bill Payment' },
+  { value: 'investment',    label: 'Investment' },
+  { value: 'cashback',      label: 'Cashback' },
+  { value: 'split_expense', label: 'Split Expense' },
+  { value: 'reimbursement', label: 'Reimbursement' },
+];
+
+export default function FilterBar({ filters = {}, onChange, onReset, className = '' }) {
+  const { accounts, categories, transactions } = useData();
+  const { ownerOptions } = useOwners();
+
+  const accountOptions = [
+    { value: '', label: 'All Accounts' },
+    ...accounts
+      .filter((a) => !a._removed)
+      .map((a) => ({ value: a.id, label: a.name })),
+  ];
+
+  const categoryOptions = [
+    { value: '', label: 'Category' },
+    ...categories.map((c) => ({ value: c.id, label: c.name })),
+  ];
+
+  const beneficiaryOptions = [
+    { value: '', label: 'Beneficiary' },
+    ...[...new Set(transactions.map((t) => t.beneficiary).filter(Boolean))].map((b) => ({
+      value: b,
+      label: b,
+    })),
+  ];
+
+  const hasActiveFilters = Object.values(filters).some((v) => v !== '' && v != null);
+
+  return (
+    <div className={`flex flex-wrap items-center gap-2.5 py-1 ${className}`}>
+      {/* Date range */}
+      <div className="flex items-center gap-1.5 w-full sm:w-auto">
+        <CalendarPicker
+          value={filters.dateFrom ?? ''}
+          onChange={(val) => onChange('dateFrom', val)}
+          placeholder="From"
+          compact
+          className="flex-1 sm:flex-none"
+        />
+        <span className="text-gray-300 text-sm">→</span>
+        <CalendarPicker
+          value={filters.dateTo ?? ''}
+          onChange={(val) => onChange('dateTo', val)}
+          placeholder="To"
+          min={filters.dateFrom || undefined}
+          compact
+          className="flex-1 sm:flex-none"
+        />
+      </div>
+
+      {/* Type */}
+      <Dropdown
+        value={filters.type ?? ''}
+        onChange={(val) => onChange('type', val)}
+        options={TRANSACTION_TYPES}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[140px] sm:flex-none"
+      />
+
+      {/* Account */}
+      <Dropdown
+        value={filters.accountId ?? ''}
+        onChange={(val) => onChange('accountId', val)}
+        options={accountOptions}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[150px] sm:flex-none"
+      />
+
+      {/* Category */}
+      <Dropdown
+        value={filters.categoryId ?? ''}
+        onChange={(val) => onChange('categoryId', val)}
+        options={categoryOptions}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[140px] sm:flex-none"
+      />
+
+      {/* Owner */}
+      {ownerOptions.length > 1 && (
+        <Dropdown
+          value={filters.owner ?? ''}
+          onChange={(val) => onChange('owner', val)}
+          options={[{ value: '', label: 'Owner' }, ...ownerOptions.filter((o) => o.value !== '')]}
+          className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[120px] sm:flex-none"
+        />
+      )}
+
+      {/* Beneficiary */}
+      {beneficiaryOptions.length > 1 && (
+        <Dropdown
+          value={filters.beneficiary ?? ''}
+          onChange={(val) => onChange('beneficiary', val)}
+          options={beneficiaryOptions}
+          className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[130px] sm:flex-none"
+        />
+      )}
+
+      {/* Reset */}
+      {onReset && hasActiveFilters && (
+        <button
+          onClick={onReset}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Reset
+        </button>
+      )}
+    </div>
+  );
+}

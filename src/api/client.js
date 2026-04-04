@@ -1,0 +1,126 @@
+const BASE_URL = '';
+
+function getToken() {
+  return localStorage.getItem('authToken');
+}
+
+function setToken(token) {
+  localStorage.setItem('authToken', token);
+}
+
+function clearToken() {
+  localStorage.removeItem('authToken');
+}
+
+async function request(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  const token = getToken();
+  if (token) {
+    headers['Authorization'] = `Token ${token}`;
+  }
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  if (res.status === 401) {
+    clearToken();
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
+  }
+
+  if (res.status === 204) return null;
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    const msg = data.detail || data.error || JSON.stringify(data);
+    throw new Error(msg);
+  }
+
+  return res.json();
+}
+
+const api = {
+  get: (path) => request('GET', path),
+  post: (path, body) => request('POST', path, body),
+  put: (path, body) => request('PUT', path, body),
+  patch: (path, body) => request('PATCH', path, body),
+  del: (path) => request('DELETE', path),
+
+  // Auth
+  async login(username, password) {
+    const data = await request('POST', '/api/auth/login/', { username, password });
+    setToken(data.token);
+    return data;
+  },
+
+  async register(username, password) {
+    const data = await request('POST', '/api/auth/register/', { username, password });
+    setToken(data.token);
+    return data;
+  },
+
+  async logout() {
+    try {
+      await request('POST', '/api/auth/logout/');
+    } finally {
+      clearToken();
+    }
+  },
+
+  getMe: () => request('GET', '/api/auth/me/'),
+
+  // Bulk data
+  getAllData: () => request('GET', '/api/data/all/'),
+
+  // Accounts
+  getAccounts: () => request('GET', '/api/accounts/'),
+  createAccount: (data) => request('POST', '/api/accounts/', data),
+  updateAccount: (id, data) => request('PATCH', `/api/accounts/${id}/`, data),
+  deleteAccount: (id) => request('DELETE', `/api/accounts/${id}/`),
+
+  // Categories
+  getCategories: () => request('GET', '/api/categories/'),
+  createCategory: (data) => request('POST', '/api/categories/', data),
+  updateCategory: (id, data) => request('PATCH', `/api/categories/${id}/`, data),
+  deleteCategory: (id) => request('DELETE', `/api/categories/${id}/`),
+
+  // Transactions
+  getTransactions: (params) => {
+    const qs = new URLSearchParams(params).toString();
+    return request('GET', `/api/transactions/${qs ? '?' + qs : ''}`);
+  },
+  getTransaction: (id) => request('GET', `/api/transactions/${id}/`),
+  createTransaction: (data) => request('POST', '/api/transactions/', data),
+  updateTransaction: (id, data) => request('PUT', `/api/transactions/${id}/`, data),
+  deleteTransaction: (id) => request('DELETE', `/api/transactions/${id}/`),
+
+  // Entries
+  getEntries: () => request('GET', '/api/entries/'),
+
+  // Receivables
+  getReceivables: (params) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return request('GET', `/api/receivables/${qs ? '?' + qs : ''}`);
+  },
+  updateReceivable: (id, data) => request('PATCH', `/api/receivables/${id}/`, data),
+
+  // Budgets
+  getBudgets: () => request('GET', '/api/budgets/'),
+  createBudget: (data) => request('POST', '/api/budgets/', data),
+  updateBudget: (id, data) => request('PATCH', `/api/budgets/${id}/`, data),
+  deleteBudget: (id) => request('DELETE', `/api/budgets/${id}/`),
+
+  // Settings
+  getSettings: () => request('GET', '/api/settings/'),
+  updateSetting: (key, value) => request('PUT', `/api/settings/${key}/`, { value }),
+
+  // Token helpers
+  getToken,
+  setToken,
+  clearToken,
+};
+
+export default api;
