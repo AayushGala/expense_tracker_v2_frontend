@@ -10,7 +10,7 @@ import Select from '../common/Select';
  * @param {Object}   props
  * @param {Function} props.onSubmit - Called with (transaction, entries)
  */
-export default function TransferForm({ onSubmit }) {
+export default function TransferForm({ onSubmit, initialData }) {
   const { accounts } = useData();
   const { owners, getAccountOwner } = useOwners();
 
@@ -20,12 +20,12 @@ export default function TransferForm({ onSubmit }) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(today);
-  const [fromAccountId, setFromAccountId] = useState('');
-  const [toAccountId, setToAccountId] = useState('');
-  const [owner, setOwner] = useState('');
-  const [notes, setNotes] = useState('');
+  const [amount, setAmount] = useState(initialData?.amount ?? '');
+  const [date, setDate] = useState(initialData?.date ?? today);
+  const [fromAccountId, setFromAccountId] = useState(String(initialData?.from_account_id ?? ''));
+  const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
+  const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
   function handleFromAccountChange(accountId) {
@@ -161,7 +161,7 @@ export default function TransferForm({ onSubmit }) {
                    text-white shadow-sm hover:bg-teal-700 focus:outline-none
                    focus:ring-2 focus:ring-teal-500/50 transition-colors"
       >
-        Save Transfer
+        {initialData ? 'Update Transfer' : 'Save Transfer'}
       </button>
     </form>
   );

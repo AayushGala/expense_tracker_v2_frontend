@@ -11,7 +11,7 @@ import Select from '../common/Select';
  * @param {Object}   props
  * @param {Function} props.onSubmit - Called with (transaction, entries, receivables)
  */
-export default function SplitExpenseForm({ onSubmit }) {
+export default function SplitExpenseForm({ onSubmit, initialData }) {
   const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
@@ -25,16 +25,16 @@ export default function SplitExpenseForm({ onSubmit }) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [totalAmount, setTotalAmount] = useState('');
-  const [date, setDate] = useState(today);
-  const [fromAccountId, setFromAccountId] = useState('');
-  const [owner, setOwner] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [totalAmount, setTotalAmount] = useState(initialData?.amount ?? '');
+  const [date, setDate] = useState(initialData?.date ?? today);
+  const [fromAccountId, setFromAccountId] = useState(String(initialData?.from_account_id ?? ''));
+  const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [categoryId, setCategoryId] = useState(String(initialData?.category_id ?? ''));
   const [totalPeople, setTotalPeople] = useState('2');
   // myShareType: 'equal' (even split) | 'custom' (enter amount directly)
   const [myShareType, setMyShareType] = useState('equal');
   const [customMyShare, setCustomMyShare] = useState('');
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState(initialData?.notes ?? '');
 
   // Each other person: { id, name, amount }
   const [otherPeople, setOtherPeople] = useState([{ id: crypto.randomUUID(), name: '', amount: '' }]);
@@ -371,7 +371,7 @@ export default function SplitExpenseForm({ onSubmit }) {
                    text-white shadow-sm hover:bg-teal-700 focus:outline-none
                    focus:ring-2 focus:ring-teal-500/50 transition-colors"
       >
-        Save Split Expense
+        {initialData ? 'Update Split Expense' : 'Save Split Expense'}
       </button>
     </form>
   );

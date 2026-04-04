@@ -12,7 +12,7 @@ import Select from '../common/Select';
  * @param {Object}   props
  * @param {Function} props.onSubmit - Called with (transaction, entries, updatedReceivable)
  */
-export default function ReimbursementForm({ onSubmit }) {
+export default function ReimbursementForm({ onSubmit, initialData }) {
   const { accounts, receivables } = useData();
   const { owners, getAccountOwner } = useOwners();
 
@@ -31,11 +31,11 @@ export default function ReimbursementForm({ onSubmit }) {
   const today = new Date().toISOString().slice(0, 10);
 
   const [selectedReceivableId, setSelectedReceivableId] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(today);
-  const [toAccountId, setToAccountId] = useState('');
-  const [owner, setOwner] = useState('');
-  const [notes, setNotes] = useState('');
+  const [amount, setAmount] = useState(initialData?.amount ?? '');
+  const [date, setDate] = useState(initialData?.date ?? today);
+  const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
+  const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
   const selectedReceivable = pendingReceivables.find(
@@ -215,7 +215,7 @@ export default function ReimbursementForm({ onSubmit }) {
                        text-white shadow-sm hover:bg-teal-700 focus:outline-none
                        focus:ring-2 focus:ring-teal-500/50 transition-colors"
           >
-            Record Reimbursement
+            {initialData ? 'Update Reimbursement' : 'Record Reimbursement'}
           </button>
         </>
       )}

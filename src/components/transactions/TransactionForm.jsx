@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
 import TypeSelector from './TypeSelector';
 import ExpenseForm from './ExpenseForm';
@@ -12,11 +12,107 @@ import SplitExpenseForm from './SplitExpenseForm';
 import ReimbursementForm from './ReimbursementForm';
 import Card from '../common/Card';
 
+/**
+ * Reconstruct form-friendly fields from a transaction + its entries.
+ * The Transaction model only stores type/date/notes/etc.
+ * The amounts and account references live in the Entry objects.
+ */
+function buildInitialData(transaction, entries, accounts) {
+  if (!transaction) return null;
+
+  const txnEntries = entries.filter(
+    (e) => e.transaction_id === transaction.id
+  );
+
+  // Build a set of account IDs for quick lookup
+  const accountIds = new Set(accounts.map((a) => a.id));
+
+  // Separate entries into account entries and category entries
+  const accountEntries = txnEntries.filter((e) => accountIds.has(e.account_id));
+  const categoryEntries = txnEntries.filter((e) => !accountIds.has(e.account_id));
+
+  const debitAccountEntry = accountEntries.find((e) => e.entry_type === 'DEBIT');
+  const creditAccountEntry = accountEntries.find((e) => e.entry_type === 'CREDIT');
+  const debitCategoryEntry = categoryEntries.find((e) => e.entry_type === 'DEBIT');
+  const creditCategoryEntry = categoryEntries.find((e) => e.entry_type === 'CREDIT');
+
+  // Amount from any entry (they should all have the same absolute amount)
+  const amount = txnEntries[0]?.amount ?? '';
+
+  const base = {
+    ...transaction,
+    amount,
+  };
+
+  switch (transaction.type) {
+    case 'expense':
+      // CREDIT account = from_account, DEBIT category = category
+      return {
+        ...base,
+        from_account_id: creditAccountEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? debitCategoryEntry?.account_id ?? '',
+      };
+
+    case 'income':
+      // DEBIT account = to_account, CREDIT category = category
+      return {
+        ...base,
+        to_account_id: debitAccountEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? creditCategoryEntry?.account_id ?? '',
+      };
+
+    case 'transfer':
+    case 'bill_payment':
+    case 'investment':
+      // DEBIT account = to_account, CREDIT account = from_account
+      return {
+        ...base,
+        from_account_id: creditAccountEntry?.account_id ?? '',
+        to_account_id: debitAccountEntry?.account_id ?? '',
+      };
+
+    case 'cashback':
+      // DEBIT account = account receiving cashback
+      return {
+        ...base,
+        account_id: debitAccountEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? creditCategoryEntry?.account_id ?? '',
+      };
+
+    case 'split_expense':
+      return {
+        ...base,
+        from_account_id: creditAccountEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? debitCategoryEntry?.account_id ?? '',
+      };
+
+    case 'reimbursement':
+      return {
+        ...base,
+        to_account_id: debitAccountEntry?.account_id ?? '',
+      };
+
+    default:
+      return base;
+  }
+}
+
 export default function TransactionForm() {
   const navigate = useNavigate();
-  const { addTransaction } = useData();
+  const { id } = useParams();
+  const { transactions, entries, accounts, addTransaction, updateTransaction } = useData();
 
-  const [type, setType] = useState('expense');
+  const isEditing = Boolean(id);
+
+  // Find existing transaction and reconstruct form data from entries
+  const initialData = useMemo(() => {
+    if (!id) return null;
+    const txn = transactions.find((t) => String(t.id) === String(id));
+    if (!txn) return null;
+    return buildInitialData(txn, entries, accounts);
+  }, [id, transactions, entries, accounts]);
+
+  const [type, setType] = useState(initialData?.type ?? 'expense');
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(transactionData) {
@@ -24,7 +120,11 @@ export default function TransactionForm() {
     setSubmitting(true);
 
     try {
-      await addTransaction(transactionData);
+      if (isEditing) {
+        await updateTransaction(parseInt(id), transactionData);
+      } else {
+        await addTransaction(transactionData);
+      }
       navigate(-1);
     } catch (err) {
       console.error('TransactionForm: submit failed', err);
@@ -32,16 +132,21 @@ export default function TransactionForm() {
     }
   }
 
+  const formProps = {
+    onSubmit: handleSubmit,
+    initialData,
+  };
+
   function renderSubForm() {
     switch (type) {
-      case 'expense':       return <ExpenseForm onSubmit={handleSubmit} />;
-      case 'income':        return <IncomeForm onSubmit={handleSubmit} />;
-      case 'transfer':      return <TransferForm onSubmit={handleSubmit} />;
-      case 'bill_payment':  return <BillPaymentForm onSubmit={handleSubmit} />;
-      case 'investment':    return <InvestmentForm onSubmit={handleSubmit} />;
-      case 'cashback':      return <CashbackForm onSubmit={handleSubmit} />;
-      case 'split_expense': return <SplitExpenseForm onSubmit={handleSubmit} />;
-      case 'reimbursement': return <ReimbursementForm onSubmit={handleSubmit} />;
+      case 'expense':       return <ExpenseForm {...formProps} />;
+      case 'income':        return <IncomeForm {...formProps} />;
+      case 'transfer':      return <TransferForm {...formProps} />;
+      case 'bill_payment':  return <BillPaymentForm {...formProps} />;
+      case 'investment':    return <InvestmentForm {...formProps} />;
+      case 'cashback':      return <CashbackForm {...formProps} />;
+      case 'split_expense': return <SplitExpenseForm {...formProps} />;
+      case 'reimbursement': return <ReimbursementForm {...formProps} />;
       default:              return null;
     }
   }
@@ -63,8 +168,12 @@ export default function TransactionForm() {
       {/* Page header */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">New Transaction</h1>
-          <p className="text-sm text-gray-400 mt-1">Record a new entry into your finances.</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isEditing ? 'Edit Transaction' : 'New Transaction'}
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">
+            {isEditing ? 'Update the details of this transaction.' : 'Record a new entry into your finances.'}
+          </p>
         </div>
         <button
           onClick={() => navigate(-1)}
@@ -77,7 +186,7 @@ export default function TransactionForm() {
       {/* Transaction type card */}
       <Card className="p-5 mb-6">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">Transaction Type</p>
-        <TypeSelector value={type} onChange={setType} />
+        <TypeSelector value={type} onChange={setType} disabled={isEditing} />
       </Card>
 
       {/* Form card */}

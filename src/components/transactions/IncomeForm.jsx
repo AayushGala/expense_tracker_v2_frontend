@@ -10,7 +10,7 @@ import Select from '../common/Select';
  * @param {Object}   props
  * @param {Function} props.onSubmit - Called with (transaction, entries)
  */
-export default function IncomeForm({ onSubmit }) {
+export default function IncomeForm({ onSubmit, initialData }) {
   const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
@@ -19,12 +19,12 @@ export default function IncomeForm({ onSubmit }) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(today);
-  const [toAccountId, setToAccountId] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [owner, setOwner] = useState('');
-  const [notes, setNotes] = useState('');
+  const [amount, setAmount] = useState(initialData?.amount ?? '');
+  const [date, setDate] = useState(initialData?.date ?? today);
+  const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
+  const [categoryId, setCategoryId] = useState(String(initialData?.category_id ?? ''));
+  const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
   function handleToAccountChange(accountId) {
@@ -153,7 +153,7 @@ export default function IncomeForm({ onSubmit }) {
                    text-white shadow-sm hover:bg-teal-700 focus:outline-none
                    focus:ring-2 focus:ring-teal-500/50 transition-colors"
       >
-        Save Income
+        {initialData ? 'Update Income' : 'Save Income'}
       </button>
     </form>
   );

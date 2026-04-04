@@ -6,7 +6,7 @@ import Select from '../common/Select';
 
 const PREDEFINED_BENEFICIARIES = ['self', 'family'];
 
-export default function ExpenseForm({ onSubmit }) {
+export default function ExpenseForm({ onSubmit, initialData }) {
   const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
@@ -17,15 +17,27 @@ export default function ExpenseForm({ onSubmit }) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(today);
-  const [fromAccountId, setFromAccountId] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [owner, setOwner] = useState('');
-  const [beneficiaryType, setBeneficiaryType] = useState('self');
-  const [customBeneficiary, setCustomBeneficiary] = useState('');
-  const [tags, setTags] = useState('');
-  const [notes, setNotes] = useState('');
+  // Parse beneficiary from initialData
+  const initBeneficiary = initialData?.beneficiary ?? '';
+  const initBeneficiaryType = PREDEFINED_BENEFICIARIES.includes(initBeneficiary)
+    ? initBeneficiary
+    : initBeneficiary
+      ? 'custom'
+      : 'self';
+  const initCustomBeneficiary =
+    initBeneficiary && !PREDEFINED_BENEFICIARIES.includes(initBeneficiary)
+      ? initBeneficiary
+      : '';
+
+  const [amount, setAmount] = useState(initialData?.amount ?? '');
+  const [date, setDate] = useState(initialData?.date ?? today);
+  const [fromAccountId, setFromAccountId] = useState(String(initialData?.from_account_id ?? ''));
+  const [categoryId, setCategoryId] = useState(String(initialData?.category_id ?? ''));
+  const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [beneficiaryType, setBeneficiaryType] = useState(initBeneficiaryType);
+  const [customBeneficiary, setCustomBeneficiary] = useState(initCustomBeneficiary);
+  const [tags, setTags] = useState(initialData?.tags ?? '');
+  const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
   function handleFromAccountChange(accountId) {
@@ -209,7 +221,7 @@ export default function ExpenseForm({ onSubmit }) {
                    text-white shadow-sm hover:bg-teal-700 focus:outline-none
                    focus:ring-2 focus:ring-teal-500/50 transition-colors active:bg-teal-800"
       >
-        Save Expense
+        {initialData ? 'Update Expense' : 'Save Expense'}
       </button>
     </form>
   );

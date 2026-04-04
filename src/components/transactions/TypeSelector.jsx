@@ -11,7 +11,7 @@ const TRANSACTION_TYPES = [
   'reimbursement',
 ];
 
-export default function TypeSelector({ value, onChange }) {
+export default function TypeSelector({ value, onChange, disabled = false }) {
   return (
     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1 sm:flex-wrap">
       {TRANSACTION_TYPES.map((type) => {
@@ -20,7 +20,8 @@ export default function TypeSelector({ value, onChange }) {
           <button
             key={type}
             type="button"
-            onClick={() => onChange(type)}
+            disabled={disabled && !isSelected}
+            onClick={() => !disabled && onChange(type)}
             className={`
               flex-shrink-0 inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold
               border transition-all duration-150
