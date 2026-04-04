@@ -41,7 +41,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200/60 p-8 max-w-sm w-full mx-4">
         <div className="text-center mb-8">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 text-white">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1e2a30] text-white">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
               <path d="M2 17l10 5 10-5" />
@@ -63,7 +63,7 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               autoFocus
-              className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 hover:border-gray-300 placeholder-gray-400"
+              className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400"
               placeholder="Choose a username"
             />
           </div>
@@ -78,7 +78,7 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-gray-700 transition-colors focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 hover:border-gray-300 placeholder-gray-400"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400"
                 placeholder="At least 8 characters"
               />
               <button
@@ -112,7 +112,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-gray-700 transition-colors focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 hover:border-gray-300 placeholder-gray-400"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400"
                 placeholder="Repeat password"
               />
             </div>
@@ -125,7 +125,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-colors disabled:opacity-50"
+            className="w-full rounded-xl bg-[#1e2a30] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors disabled:opacity-50"
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-teal-600 hover:text-teal-700">
+          <Link to="/login" className="font-semibold text-[#2cbcac] hover:text-[#2cbcac]">
             Sign In
           </Link>
         </p>

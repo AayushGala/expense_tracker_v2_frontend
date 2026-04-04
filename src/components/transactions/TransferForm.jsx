@@ -69,75 +69,80 @@ export default function TransferForm({ onSubmit, initialData }) {
     });
   }
 
-  const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 hover:border-gray-300 placeholder-gray-400';
+  const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400';
   const labelClass = 'block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5';
   const errorClass = 'mt-1.5 text-xs text-rose-500 font-medium';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Amount */}
       <div>
-        <label className={labelClass}>Amount (₹)</label>
-        <input
-          type="number"
-          inputMode="decimal"
-          min="0"
-          step="0.01"
-          placeholder="0.00"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className={inputClass}
-        />
+        <label className={labelClass}>Amount</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">₹</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-[#2cbcac] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 placeholder-gray-300"
+          />
+        </div>
         {errors.amount && <p className={errorClass}>{errors.amount}</p>}
       </div>
 
-      {/* Date */}
-      <div>
-        <label className={labelClass}>Date</label>
-        <CalendarPicker value={date} onChange={(val) => setDate(val)} className="w-full" />
-        {errors.date && <p className={errorClass}>{errors.date}</p>}
-      </div>
-
-      {/* From Account */}
-      <div>
-        <label className={labelClass}>From Account</label>
-        <Select
-          value={fromAccountId}
-          onChange={(e) => handleFromAccountChange(e.target.value)}
-          options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
-          placeholder="Select source account"
-        />
-        {errors.fromAccountId && (
-          <p className={errorClass}>{errors.fromAccountId}</p>
-        )}
-      </div>
-
-      {/* To Account */}
-      <div>
-        <label className={labelClass}>To Account</label>
-        <Select
-          value={toAccountId}
-          onChange={(e) => setToAccountId(e.target.value)}
-          options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
-          placeholder="Select destination account"
-        />
-        {errors.toAccountId && (
-          <p className={errorClass}>{errors.toAccountId}</p>
-        )}
-      </div>
-
-      {/* Owner */}
-      {owners.length > 0 && (
+      {/* Date + Owner */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Owner</label>
-          <Select
-            value={owner}
-            onChange={(e) => setOwner(e.target.value)}
-            options={owners.map((o) => ({ value: o, label: o }))}
-            placeholder="Unassigned"
-          />
+          <label className={labelClass}>Date</label>
+          <CalendarPicker value={date} onChange={(val) => setDate(val)} className="w-full" />
+          {errors.date && <p className={errorClass}>{errors.date}</p>}
         </div>
-      )}
+
+        {owners.length > 0 && (
+          <div>
+            <label className={labelClass}>Owner</label>
+            <Select
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              options={owners.map((o) => ({ value: o, label: o }))}
+              placeholder="Unassigned"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* From Account + To Account */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>From Account</label>
+          <Select
+            value={fromAccountId}
+            onChange={(e) => handleFromAccountChange(e.target.value)}
+            options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            placeholder="Select source account"
+          />
+          {errors.fromAccountId && (
+            <p className={errorClass}>{errors.fromAccountId}</p>
+          )}
+        </div>
+
+        <div>
+          <label className={labelClass}>To Account</label>
+          <Select
+            value={toAccountId}
+            onChange={(e) => setToAccountId(e.target.value)}
+            options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            placeholder="Select destination account"
+          />
+          {errors.toAccountId && (
+            <p className={errorClass}>{errors.toAccountId}</p>
+          )}
+        </div>
+      </div>
 
       {/* Notes */}
       <div>
@@ -157,9 +162,9 @@ export default function TransferForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold
-                   text-white shadow-sm hover:bg-teal-700 focus:outline-none
-                   focus:ring-2 focus:ring-teal-500/50 transition-colors"
+        className="w-full rounded-xl bg-[#1e2a30] px-4 py-3 text-sm font-bold
+                   text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none
+                   focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors"
       >
         {initialData ? 'Update Transfer' : 'Save Transfer'}
       </button>

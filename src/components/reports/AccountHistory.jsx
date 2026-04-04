@@ -19,7 +19,7 @@ function CustomTooltip({ active, payload, label }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-md px-4 py-2 text-sm">
       <p className="font-medium text-gray-700 mb-1">{label}</p>
-      <p className="text-teal-600 font-semibold">{formatINR(payload[0].value)}</p>
+      <p className="text-[#2cbcac] font-semibold">{formatINR(payload[0].value)}</p>
     </div>
   );
 }
@@ -124,7 +124,7 @@ export default function AccountHistory() {
               <Line
                 type="stepAfter"
                 dataKey="balance"
-                stroke="#14b8a6"
+                stroke="#2cbcac"
                 strokeWidth={2.5}
                 dot={false}
                 activeDot={{ r: 4 }}

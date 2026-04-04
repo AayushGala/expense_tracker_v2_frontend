@@ -5,7 +5,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 
 const inputClass =
-  'text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 hover:border-gray-300 transition-colors';
+  'text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/30 focus:border-[#2cbcac] hover:border-gray-300 transition-colors';
 
 // ---------------------------------------------------------------------------
 // Account Row
@@ -47,12 +47,12 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
               if (e.key === 'Enter') handleSaveName();
               if (e.key === 'Escape') { setName(account.name); setEditing(false); }
             }}
-            className={`flex-1 ${inputClass} !border-teal-300`}
+            className={`flex-1 ${inputClass} !border-[#2cbcac]`}
           />
           <button
             onClick={handleSaveName}
             disabled={savingName}
-            className="text-xs px-3 py-1.5 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 disabled:opacity-50 transition-colors"
+            className="text-xs px-3 py-1.5 bg-[#1e2a30] text-white rounded-lg font-semibold hover:bg-[#2a3a42] disabled:opacity-50 transition-colors"
           >
             {savingName ? '...' : 'Save'}
           </button>
@@ -77,7 +77,7 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
               onChange={async (e) => {
                 await onUpdate(account.id, { owner: e.target.value });
               }}
-              className="text-[11px] border border-gray-200 rounded-lg px-1.5 py-1 text-gray-500 focus:outline-none focus:ring-1 focus:ring-teal-500/20 shrink-0"
+              className="text-[11px] border border-gray-200 rounded-lg px-1.5 py-1 text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#2cbcac]/30 shrink-0"
             >
               <option value="">No owner</option>
               {owners.map((o) => (
@@ -88,7 +88,7 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
           <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setEditing(true)}
-              className="text-xs text-gray-400 hover:text-teal-600 px-2 py-1 rounded-lg hover:bg-teal-50 font-medium transition-colors shrink-0"
+              className="text-xs text-gray-400 hover:text-[#2cbcac] px-2 py-1 rounded-lg hover:bg-[#c5f1ec]/30 font-medium transition-colors shrink-0"
             >
               Rename
             </button>
@@ -247,7 +247,7 @@ export default function AccountManager() {
           <button
             onClick={handleAdd}
             disabled={adding}
-            className="text-sm px-5 py-2 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 transition-colors"
+            className="text-sm px-5 py-2 bg-[#1e2a30] text-white rounded-xl font-bold hover:bg-[#2a3a42] disabled:opacity-50 transition-colors"
           >
             {adding ? 'Adding...' : 'Add'}
           </button>

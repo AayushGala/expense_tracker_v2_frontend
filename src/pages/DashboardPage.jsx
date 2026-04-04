@@ -30,9 +30,9 @@ import { formatDate, formatINR } from '../utils/formatters';
 const BENEFICIARY_OPTIONS = ['All', 'Self', 'Family'];
 
 const PIE_COLORS = [
-  '#0d9488', '#8b5cf6', '#ec4899', '#f59e0b',
-  '#10b981', '#3b82f6', '#ef4444', '#14b8a6',
-  '#f97316', '#84cc16', '#06b6d4', '#a855f7',
+  '#1e2a30', '#2cbcac', '#7c9ea6', '#c5f1ec',
+  '#4a6670', '#a8d8d0', '#34495e', '#5dade2',
+  '#85929e', '#48c9b0', '#2c3e50', '#76d7c4',
 ];
 
 // ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ function BeneficiaryToggle({ value, onChange }) {
           onClick={() => onChange(opt)}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all
             ${value === opt
-              ? 'bg-white text-teal-700 shadow-sm'
+              ? 'bg-white text-[#1e2a30] shadow-sm'
               : 'text-gray-400 hover:text-gray-600'
             }`}
         >
@@ -155,7 +155,7 @@ function MonthlySpendingChart({ data }) {
     return (
       <div className="rounded-xl bg-white ring-1 ring-gray-200 shadow-lg px-3 py-2 text-sm">
         <p className="font-semibold text-gray-700 mb-0.5">{label}</p>
-        <p className="text-teal-600 font-bold">{formatINR(payload[0].value)}</p>
+        <p className="text-[#2cbcac] font-bold">{formatINR(payload[0].value)}</p>
       </div>
     );
   };
@@ -181,7 +181,7 @@ function MonthlySpendingChart({ data }) {
             width={48}
           />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f3f4f6' }} />
-          <Bar dataKey="total" fill="#0d9488" radius={[8, 8, 0, 0]} maxBarSize={48} />
+          <Bar dataKey="total" fill="#1e2a30" radius={[8, 8, 0, 0]} maxBarSize={48} />
         </BarChart>
       </ResponsiveContainer>
     </Card>
@@ -213,7 +213,7 @@ function CategoryPieChart({ data }) {
     return (
       <div className="rounded-xl bg-white ring-1 ring-gray-200 shadow-lg px-3 py-2 text-sm">
         <p className="font-semibold text-gray-700">{payload[0].name}</p>
-        <p className="text-teal-600 font-bold">{formatINR(payload[0].value)}</p>
+        <p className="text-[#2cbcac] font-bold">{formatINR(payload[0].value)}</p>
       </div>
     );
   };
@@ -334,7 +334,7 @@ function ReceivablesSummary({ summary }) {
           {byPerson.map(({ person, amount }) => (
             <li key={person} className="flex items-center justify-between py-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-teal-50 flex items-center justify-center text-xs font-bold text-teal-700 uppercase flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-[#c5f1ec] flex items-center justify-center text-xs font-bold text-[#1e2a30] uppercase flex-shrink-0">
                   {person.charAt(0)}
                 </div>
                 <span className="text-sm font-medium text-gray-700">{person}</span>

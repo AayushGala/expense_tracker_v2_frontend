@@ -48,9 +48,9 @@ function subTypeLabel(sub) {
 
 function AccountTypeBadge({ type, subType }) {
   const colors = {
-    asset:      'bg-emerald-50 text-emerald-700 ring-emerald-200/60',
-    liability:  'bg-rose-50 text-rose-600 ring-rose-200/60',
-    receivable: 'bg-sky-50 text-sky-700 ring-sky-200/60',
+    asset:      'bg-[#c5f1ec] text-[#1e2a30] ring-[#2cbcac]/30',
+    liability:  'bg-[#1e2a30] text-white ring-[#1e2a30]/20',
+    receivable: 'bg-gray-100 text-gray-600 ring-gray-200/60',
   };
   return (
     <span
@@ -67,7 +67,13 @@ function AccountTypeBadge({ type, subType }) {
 // AccountLedger — displayed inside a modal
 // ---------------------------------------------------------------------------
 
-function AccountLedger({ account, ledger }) {
+function AccountLedger({ account, ledger, transactions }) {
+  // Build a lookup for transaction descriptions
+  const txnMap = useMemo(
+    () => new Map((transactions ?? []).map((t) => [t.id, t])),
+    [transactions]
+  );
+
   if (ledger.length === 0) {
     return (
       <EmptyState
@@ -78,71 +84,52 @@ function AccountLedger({ account, ledger }) {
     );
   }
 
-  return (
-    <>
-      {/* Mobile card list */}
-      <div className="md:hidden -mx-6 divide-y divide-gray-50">
-        {ledger.map((entry) => (
-          <div key={entry.id} className="flex items-center gap-3 px-6 py-3">
-            <span
-              className={`inline-block w-9 text-xs font-medium rounded px-1.5 py-0.5 text-center flex-shrink-0 ${
-                entry.entry_type === 'DEBIT'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-600'
-              }`}
-            >
-              {entry.entry_type === 'DEBIT' ? 'DR' : 'CR'}
-            </span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm tabular-nums text-gray-700">₹{entry.amount.toFixed(2)}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{formatDate(entry.date)}</p>
-            </div>
-            <AmountDisplay amount={entry.runningBalance} className="text-sm font-semibold flex-shrink-0" />
-          </div>
-        ))}
-      </div>
+  function txnLabel(entry) {
+    const txn = txnMap.get(entry.transaction_id);
+    if (!txn) return '';
+    return txn.notes || txn.beneficiary || txn.description || '';
+  }
 
-      {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto -mx-6 px-6">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th className="pb-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide w-24">Date</th>
-              <th className="pb-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">Entry</th>
-              <th className="pb-2 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide w-28">Amount</th>
-              <th className="pb-2 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide w-32">Balance</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {ledger.map((entry) => (
-              <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
-                <td className="py-2.5 text-gray-400 text-xs whitespace-nowrap">
-                  {formatDate(entry.date)}
-                </td>
-                <td className="py-2.5 text-gray-700 truncate max-w-[180px]">
-                  <span
-                    className={`inline-block w-12 text-xs font-medium rounded px-1.5 py-0.5 mr-2 text-center ${
-                      entry.entry_type === 'DEBIT'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-600'
-                    }`}
-                  >
-                    {entry.entry_type === 'DEBIT' ? 'DR' : 'CR'}
-                  </span>
-                  {entry.transaction_id}
-                </td>
-                <td className="py-2.5 text-right tabular-nums text-gray-700">
-                  ₹{entry.amount.toFixed(2)}
-                </td>
-                <td className="py-2.5 text-right tabular-nums">
-                  <AmountDisplay amount={entry.runningBalance} className="text-sm" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+  // For debit-normal accounts (asset, receivable): debit = money in (+)
+  // For credit-normal accounts (liability): credit = money in (+)
+  const isDebitNormal = account.type === 'asset' || account.type === 'receivable';
+
+  return (
+    <div className="space-y-2">
+      {ledger.map((entry) => {
+        const label = txnLabel(entry);
+        const isDebit = entry.entry_type === 'DEBIT';
+        const isPositive = isDebitNormal ? isDebit : !isDebit;
+
+        return (
+          <div key={entry.id} className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3">
+            {/* Details */}
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-medium text-gray-800 truncate">
+                {label || formatDate(entry.date)}
+              </p>
+              {label && (
+                <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(entry.date)}</p>
+              )}
+            </div>
+
+            {/* Badge */}
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+              isPositive ? 'bg-[#c5f1ec] text-[#1e2a30]' : 'bg-gray-200 text-gray-600'
+            }`}>
+              {isDebit ? 'DR' : 'CR'}
+            </span>
+
+            {/* Amount */}
+            <p className={`text-[15px] font-semibold tabular-nums shrink-0 ${
+              isPositive ? 'text-[#2cbcac]' : 'text-gray-800'
+            }`}>
+              {isPositive ? '+' : '-'}₹{entry.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -163,9 +150,9 @@ const ACCOUNT_ICONS = {
 };
 
 const ACCOUNT_ICON_COLORS = {
-  asset:      'bg-emerald-100 text-emerald-600',
-  liability:  'bg-rose-100 text-rose-500',
-  receivable: 'bg-sky-100 text-sky-600',
+  asset:      'bg-[#c5f1ec] text-[#1e2a30]',
+  liability:  'bg-[#1e2a30]/10 text-[#1e2a30]',
+  receivable: 'bg-gray-100 text-gray-500',
 };
 
 function AccountIcon({ type, subType }) {
@@ -192,7 +179,7 @@ function AccountCard({ account, balance, onClick }) {
         <div className="flex items-center gap-2 mt-1 flex-wrap">
           <AccountTypeBadge type={account.type} subType={account.sub_type} />
           {account.owner && (
-            <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-semibold ring-1 bg-indigo-50 text-indigo-700 ring-indigo-200/60">
+            <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-semibold ring-1 bg-gray-100 text-gray-600 ring-gray-200/60">
               {account.owner}
             </span>
           )}
@@ -254,7 +241,7 @@ function AccountSection({ title, accounts, getBalance, onAccountClick, balanceSu
 // ---------------------------------------------------------------------------
 
 export default function AccountsPage() {
-  const { isLoading } = useData();
+  const { isLoading, transactions } = useData();
   const { accountsByType, getAccountBalance, getAccountLedger } = useAccounts();
   const { owners, ownerOptions } = useOwners();
 
@@ -390,38 +377,23 @@ export default function AccountsPage() {
         maxWidth="max-w-lg md:max-w-2xl"
       >
         {ledgerAccount && (
-          <div className="flex flex-col gap-4">
-            {/* Account meta */}
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <AccountTypeBadge
-                  type={ledgerAccount.type}
-                  subType={ledgerAccount.sub_type}
-                />
-                <span className="text-xs text-gray-400">{ledgerAccount.currency ?? 'INR'}</span>
+          <div className="flex flex-col gap-5">
+            {/* Balance summary */}
+            <div className="flex items-center justify-between rounded-2xl bg-[#1e2a30] px-5 py-4">
+              <div>
+                <p className="text-[11px] text-[#7a9a9e] font-medium uppercase tracking-wider">Current Balance</p>
+                <p className="text-2xl font-bold text-white tabular-nums mt-1">
+                  ₹{Math.abs(getAccountBalance(ledgerAccount.id)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">Balance</span>
-                <AmountDisplay
-                  amount={getAccountBalance(ledgerAccount.id)}
-                  variant={
-                    ledgerAccount.type === 'liability' ? 'expense' : 'income'
-                  }
-                  className="text-base font-bold"
-                />
+              <div className="text-right">
+                <p className="text-[11px] text-[#7a9a9e] font-medium capitalize">{ledgerAccount.sub_type || ledgerAccount.type}</p>
+                <p className="text-[11px] text-[#556d72]">{ledgerAccount.currency ?? 'INR'}</p>
               </div>
             </div>
 
-            {/* Entries table */}
-            <AccountLedger account={ledgerAccount} ledger={ledgerEntries} />
-
-            <button
-              onClick={() => setLedgerAccount(null)}
-              className="mt-1 w-full rounded-lg border border-gray-200 py-2.5 text-sm font-medium
-                         text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </button>
+            {/* Entries */}
+            <AccountLedger account={ledgerAccount} ledger={ledgerEntries} transactions={transactions} />
           </div>
         )}
       </Modal>

@@ -4,7 +4,7 @@ import Dropdown from '../common/Dropdown';
 import { useData } from '../../context/DataContext';
 
 const inputClass =
-  'text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 hover:border-gray-300 transition-colors';
+  'text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/30 focus:border-[#2cbcac] hover:border-gray-300 transition-colors';
 
 // ---------------------------------------------------------------------------
 // SubType Row
@@ -35,11 +35,11 @@ function SubTypeRow({ subType, onEdit, onDelete }) {
               if (e.key === 'Enter') handleSave();
               if (e.key === 'Escape') { setLabel(subType.label); setEditing(false); }
             }}
-            className={`flex-1 ${inputClass} !border-teal-300`}
+            className={`flex-1 ${inputClass} !border-[#2cbcac]`}
           />
           <button
             onClick={handleSave}
-            className="text-xs px-3 py-1.5 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+            className="text-xs px-3 py-1.5 bg-[#1e2a30] text-white rounded-lg font-semibold hover:bg-[#2a3a42] transition-colors"
           >
             Save
           </button>
@@ -56,7 +56,7 @@ function SubTypeRow({ subType, onEdit, onDelete }) {
           <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setEditing(true)}
-              className="text-xs text-gray-400 hover:text-teal-600 px-2 py-1 rounded-lg hover:bg-teal-50 font-medium transition-colors"
+              className="text-xs text-gray-400 hover:text-[#2cbcac] px-2 py-1 rounded-lg hover:bg-[#c5f1ec]/30 font-medium transition-colors"
             >
               Edit
             </button>
@@ -64,7 +64,7 @@ function SubTypeRow({ subType, onEdit, onDelete }) {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => { onDelete(subType.id); setConfirmDelete(false); }}
-                  className="text-xs px-2.5 py-1 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
+                  className="text-xs px-2.5 py-1 bg-[#1e2a30] text-white rounded-lg font-semibold hover:bg-[#2a3a42] transition-colors"
                 >
                   Confirm
                 </button>
@@ -78,7 +78,7 @@ function SubTypeRow({ subType, onEdit, onDelete }) {
             ) : (
               <button
                 onClick={() => setConfirmDelete(true)}
-                className="text-xs text-gray-400 hover:text-rose-500 px-2 py-1 rounded-lg hover:bg-rose-50 font-medium transition-colors"
+                className="text-xs text-gray-400 hover:text-[#1e2a30] px-2 py-1 rounded-lg hover:bg-[#1e2a30]/10 font-medium transition-colors"
               >
                 Delete
               </button>
@@ -144,11 +144,11 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
                 if (e.key === 'Enter') handleSaveType();
                 if (e.key === 'Escape') { setTypeLabel(accountType.label); setEditingType(false); }
               }}
-              className={`flex-1 ${inputClass} !border-teal-300`}
+              className={`flex-1 ${inputClass} !border-[#2cbcac]`}
             />
             <button
               onClick={handleSaveType}
-              className="text-xs px-3 py-1.5 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+              className="text-xs px-3 py-1.5 bg-[#1e2a30] text-white rounded-lg font-semibold hover:bg-[#2a3a42] transition-colors"
             >
               Save
             </button>
@@ -168,7 +168,7 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
             <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => setEditingType(true)}
-                className="text-xs text-gray-400 hover:text-teal-600 px-2 py-1 rounded-lg hover:bg-teal-50 font-medium transition-colors"
+                className="text-xs text-gray-400 hover:text-[#2cbcac] px-2 py-1 rounded-lg hover:bg-[#c5f1ec]/30 font-medium transition-colors"
               >
                 Edit
               </button>
@@ -176,7 +176,7 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => { onDeleteType(accountType.id); setConfirmDeleteType(false); }}
-                    className="text-xs px-2.5 py-1 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
+                    className="text-xs px-2.5 py-1 bg-[#1e2a30] text-white rounded-lg font-semibold hover:bg-[#2a3a42] transition-colors"
                   >
                     Confirm
                   </button>
@@ -190,7 +190,7 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
               ) : (
                 <button
                   onClick={() => setConfirmDeleteType(true)}
-                  className="text-xs text-gray-400 hover:text-rose-500 px-2 py-1 rounded-lg hover:bg-rose-50 font-medium transition-colors"
+                  className="text-xs text-gray-400 hover:text-[#1e2a30] px-2 py-1 rounded-lg hover:bg-[#1e2a30]/10 font-medium transition-colors"
                 >
                   Delete
                 </button>
@@ -226,7 +226,7 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
             <button
               onClick={handleAddSubType}
               disabled={subAdding}
-              className="text-xs px-4 py-2 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 transition-colors"
+              className="text-xs px-4 py-2 bg-[#1e2a30] text-white rounded-xl font-bold hover:bg-[#2a3a42] disabled:opacity-50 transition-colors"
             >
               {subAdding ? '...' : 'Add'}
             </button>
@@ -241,7 +241,7 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
         ) : (
           <button
             onClick={() => setAddingSubType(true)}
-            className="mt-1 text-xs text-teal-600 hover:text-teal-700 font-semibold hover:bg-teal-50 px-2 py-1.5 -ml-2 rounded-lg transition-colors"
+            className="mt-1 text-xs text-[#2cbcac] hover:text-[#1e2a30] font-semibold hover:bg-[#c5f1ec]/30 px-2 py-1.5 -ml-2 rounded-lg transition-colors"
           >
             + Add Sub-Type
           </button>
@@ -300,7 +300,7 @@ export default function AccountTypeManager() {
           <button
             onClick={handleAdd}
             disabled={adding}
-            className="text-sm px-5 py-2 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 transition-colors"
+            className="text-sm px-5 py-2 bg-[#1e2a30] text-white rounded-xl font-bold hover:bg-[#2a3a42] disabled:opacity-50 transition-colors"
           >
             {adding ? 'Adding...' : 'Add'}
           </button>

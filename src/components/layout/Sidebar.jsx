@@ -63,7 +63,7 @@ export default function Sidebar() {
     <aside className="flex h-full w-64 flex-col bg-white border-r border-gray-200/80">
       {/* App branding */}
       <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-600 text-white">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1e2a30] text-white">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z" />
             <path d="M2 17l10 5 10-5" />
@@ -88,14 +88,14 @@ export default function Sidebar() {
                   [
                     'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all duration-150',
                     isActive
-                      ? 'bg-teal-50 text-teal-700'
+                      ? 'bg-[#1e2a30] text-white'
                       : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900',
                   ].join(' ')
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <span className={isActive ? 'text-teal-600' : 'text-gray-400'}>
+                    <span className={isActive ? 'text-[#2cbcac]' : 'text-gray-400'}>
                       <Icon />
                     </span>
                     {label}

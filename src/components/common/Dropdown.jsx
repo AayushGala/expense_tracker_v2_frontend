@@ -121,7 +121,7 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
           w-full flex items-center gap-2 rounded-xl border bg-white
           px-3 py-2.5 text-sm transition-colors cursor-pointer
           ${open
-            ? 'border-teal-400 ring-2 ring-teal-500/20'
+            ? 'border-[#2cbcac] ring-2 ring-[#2cbcac]/20'
             : 'border-gray-200 hover:border-gray-300'
           }
         `}
@@ -159,14 +159,14 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
                 className={`
                   w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2
                   ${isSelected
-                    ? 'bg-teal-50 text-teal-700 font-semibold'
+                    ? 'bg-[#c5f1ec] text-[#1e2a30] font-semibold'
                     : 'text-gray-700 hover:bg-gray-50'
                   }
                 `}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-3.5 w-3.5 flex-shrink-0 ${isSelected ? 'text-teal-500' : 'text-transparent'}`}
+                  className={`h-3.5 w-3.5 flex-shrink-0 ${isSelected ? 'text-[#2cbcac]' : 'text-transparent'}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >

@@ -51,10 +51,10 @@ export default function TagManager() {
               {tags.map((tag) => (
                 <div
                   key={tag}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 ring-1 ring-teal-200/60"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#c5f1ec] ring-1 ring-[#2cbcac]/30"
                 >
-                  <span className="text-sm text-teal-700 font-semibold">{tag}</span>
-                  <span className="text-[11px] text-teal-400 font-medium">
+                  <span className="text-sm text-[#1e2a30] font-semibold">{tag}</span>
+                  <span className="text-[11px] text-[#2cbcac] font-medium">
                     x{tagCounts.get(tag) ?? 0}
                   </span>
                 </div>

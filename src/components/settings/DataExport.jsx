@@ -66,7 +66,7 @@ export default function DataExport() {
   }
 
   const btnClass =
-    'shrink-0 text-sm px-5 py-2.5 min-w-[160px] justify-center bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 flex items-center gap-2 transition-colors';
+    'shrink-0 text-sm px-5 py-2.5 min-w-[160px] justify-center bg-[#1e2a30] text-white rounded-xl font-bold hover:bg-[#2a3a42] flex items-center gap-2 transition-colors';
 
   return (
     <div className="space-y-6">

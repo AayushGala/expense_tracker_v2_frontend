@@ -140,62 +140,80 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
     });
   }
 
-  const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 hover:border-gray-300 placeholder-gray-400';
+  const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400';
   const labelClass = 'block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5';
   const errorClass = 'mt-1.5 text-xs text-rose-500 font-medium';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Total Amount */}
       <div>
-        <label className={labelClass}>Total Bill Amount (₹)</label>
-        <input
-          type="number"
-          inputMode="decimal"
-          min="0"
-          step="0.01"
-          placeholder="0.00"
-          value={totalAmount}
-          onChange={(e) => setTotalAmount(e.target.value)}
-          className={inputClass}
-        />
+        <label className={labelClass}>Total Bill Amount</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">₹</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            value={totalAmount}
+            onChange={(e) => setTotalAmount(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-[#2cbcac] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 placeholder-gray-300"
+          />
+        </div>
         {errors.totalAmount && <p className={errorClass}>{errors.totalAmount}</p>}
       </div>
 
-      {/* Date */}
-      <div>
-        <label className={labelClass}>Date</label>
-        <CalendarPicker value={date} onChange={(val) => setDate(val)} className="w-full" />
-        {errors.date && <p className={errorClass}>{errors.date}</p>}
+      {/* Date + Paying Account */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Date</label>
+          <CalendarPicker value={date} onChange={(val) => setDate(val)} className="w-full" />
+          {errors.date && <p className={errorClass}>{errors.date}</p>}
+        </div>
+
+        <div>
+          <label className={labelClass}>Paying Account</label>
+          <Select
+            value={fromAccountId}
+            onChange={(e) => {
+              setFromAccountId(e.target.value);
+              setOwner(getAccountOwner(e.target.value));
+            }}
+            options={payableAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            placeholder="Select account"
+          />
+          {errors.fromAccountId && (
+            <p className={errorClass}>{errors.fromAccountId}</p>
+          )}
+        </div>
       </div>
 
-      {/* Paying Account */}
-      <div>
-        <label className={labelClass}>Paying Account</label>
-        <Select
-          value={fromAccountId}
-          onChange={(e) => {
-            setFromAccountId(e.target.value);
-            setOwner(getAccountOwner(e.target.value));
-          }}
-          options={payableAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
-          placeholder="Select account"
-        />
-        {errors.fromAccountId && (
-          <p className={errorClass}>{errors.fromAccountId}</p>
+      {/* Category + Owner */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Expense Category</label>
+          <Select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            options={expenseCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+            placeholder="Select category"
+          />
+          {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
+        </div>
+
+        {owners.length > 0 && (
+          <div>
+            <label className={labelClass}>Owner</label>
+            <Select
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              options={owners.map((o) => ({ value: o, label: o }))}
+              placeholder="Unassigned"
+            />
+          </div>
         )}
-      </div>
-
-      {/* Category */}
-      <div>
-        <label className={labelClass}>Expense Category</label>
-        <Select
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          options={expenseCategories.map((c) => ({ value: String(c.id), label: c.name }))}
-          placeholder="Select category"
-        />
-        {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
       </div>
 
       {/* Total People */}
@@ -221,7 +239,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
             onClick={() => setMyShareType('equal')}
             className={`flex-1 rounded-lg border py-3 min-h-[44px] text-sm font-medium transition-colors ${
               myShareType === 'equal'
-                ? 'bg-teal-50 border-teal-400 text-teal-700'
+                ? 'bg-[#c5f1ec] border-[#2cbcac] text-[#1e2a30]'
                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
             }`}
           >
@@ -232,7 +250,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
             onClick={() => setMyShareType('custom')}
             className={`flex-1 rounded-lg border py-3 min-h-[44px] text-sm font-medium transition-colors ${
               myShareType === 'custom'
-                ? 'bg-teal-50 border-teal-400 text-teal-700'
+                ? 'bg-[#c5f1ec] border-[#2cbcac] text-[#1e2a30]'
                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
             }`}
           >
@@ -272,19 +290,6 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
         </div>
       )}
 
-      {/* Owner */}
-      {owners.length > 0 && (
-        <div>
-          <label className={labelClass}>Owner</label>
-          <Select
-            value={owner}
-            onChange={(e) => setOwner(e.target.value)}
-            options={owners.map((o) => ({ value: o, label: o }))}
-            placeholder="Unassigned"
-          />
-        </div>
-      )}
-
       {/* Notes */}
       <div>
         <label className={labelClass}>Notes</label>
@@ -304,7 +309,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
           <button
             type="button"
             onClick={addPerson}
-            className="min-h-[44px] px-3 text-xs font-medium text-teal-600 hover:text-teal-700 rounded-lg hover:bg-teal-50 transition-colors"
+            className="min-h-[44px] px-3 text-xs font-medium text-[#2cbcac] hover:text-[#1e2a30] rounded-lg hover:bg-[#c5f1ec] transition-colors"
           >
             + Add Person
           </button>
@@ -367,9 +372,9 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold
-                   text-white shadow-sm hover:bg-teal-700 focus:outline-none
-                   focus:ring-2 focus:ring-teal-500/50 transition-colors"
+        className="w-full rounded-xl bg-[#1e2a30] px-4 py-3 text-sm font-bold
+                   text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none
+                   focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors"
       >
         {initialData ? 'Update Split Expense' : 'Save Split Expense'}
       </button>

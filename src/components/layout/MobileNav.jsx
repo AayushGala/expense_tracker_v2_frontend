@@ -66,13 +66,13 @@ export default function MobileNav() {
               className={({ isActive }) =>
                 [
                   'flex flex-col items-center gap-0.5 px-1 py-2.5 text-[10px] font-semibold transition-colors',
-                  isActive ? 'text-teal-600' : 'text-gray-400 hover:text-gray-600',
+                  isActive ? 'text-[#2cbcac]' : 'text-gray-400 hover:text-gray-600',
                 ].join(' ')
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={isActive ? 'text-teal-600' : 'text-gray-400'}>
+                  <span className={isActive ? 'text-[#2cbcac]' : 'text-gray-400'}>
                     <Icon />
                   </span>
                   {label}

@@ -140,8 +140,8 @@ export default function TransactionDetail({
       <div className="flex gap-3 pt-1">
         <button
           onClick={handleEdit}
-          className="flex-1 rounded-xl border border-teal-200 bg-teal-50 py-2.5 text-sm
-                     font-semibold text-teal-700 hover:bg-teal-100 transition-colors"
+          className="flex-1 rounded-xl border border-[#2cbcac] bg-[#c5f1ec] py-2.5 text-sm
+                     font-semibold text-[#1e2a30] hover:bg-[#c5f1ec] transition-colors"
         >
           Edit
         </button>

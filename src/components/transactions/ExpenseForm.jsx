@@ -86,7 +86,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
   }
 
   const inputClass =
-    'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 hover:border-gray-300 placeholder-gray-400';
+    'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400';
   const labelClass = 'block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5';
   const errorClass = 'mt-1.5 text-xs text-rose-500 font-medium';
 
@@ -105,7 +105,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-teal-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 placeholder-gray-300"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-[#2cbcac] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 placeholder-gray-300"
           />
         </div>
         {errors.amount && <p className={errorClass}>{errors.amount}</p>}
@@ -217,9 +217,9 @@ export default function ExpenseForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-teal-600 px-4 py-3 text-sm font-bold
-                   text-white shadow-sm hover:bg-teal-700 focus:outline-none
-                   focus:ring-2 focus:ring-teal-500/50 transition-colors active:bg-teal-800"
+        className="w-full rounded-xl bg-[#1e2a30] px-4 py-3 text-sm font-bold
+                   text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none
+                   focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors active:bg-[#141e22]"
       >
         {initialData ? 'Update Expense' : 'Save Expense'}
       </button>

@@ -115,7 +115,7 @@ export function transactionTypeColor(type) {
     transfer: 'text-blue-500',
     bill_payment: 'text-orange-500',
     investment: 'text-purple-500',
-    cashback: 'text-teal-500',
+    cashback: 'text-[#2cbcac]',
     split_expense: 'text-yellow-500',
     reimbursement: 'text-cyan-500',
   };
