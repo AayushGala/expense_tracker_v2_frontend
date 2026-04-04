@@ -24,7 +24,7 @@ function SubTypeRow({ subType, onEdit, onDelete }) {
   }
 
   return (
-    <div className="flex items-center gap-2 py-2.5 pl-6 group">
+    <div className="flex items-center gap-2 py-2.5 group">
       {editing ? (
         <>
           <input
@@ -52,10 +52,7 @@ function SubTypeRow({ subType, onEdit, onDelete }) {
         </>
       ) : (
         <>
-          <span className="text-[11px] px-2 py-0.5 rounded-lg font-medium ring-1 bg-gray-50 text-gray-500 ring-gray-200/60 shrink-0">
-            {subType.name}
-          </span>
-          <span className="flex-1 text-sm font-medium text-gray-600">{subType.label}</span>
+          <span className="flex-1 text-[13px] text-gray-600">{subType.label}</span>
           <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setEditing(true)}
@@ -104,10 +101,13 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
 
   // Add sub-type form
   const [addingSubType, setAddingSubType] = useState(false);
-  const [newSubName, setNewSubName] = useState('');
   const [newSubLabel, setNewSubLabel] = useState('');
   const [subError, setSubError] = useState('');
   const [subAdding, setSubAdding] = useState(false);
+
+  function toKey(label) {
+    return label.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  }
 
   function handleSaveType() {
     const trimmed = typeLabel.trim();
@@ -118,14 +118,11 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
   }
 
   async function handleAddSubType() {
-    const trimmedName = newSubName.trim();
     const trimmedLabel = newSubLabel.trim();
-    if (!trimmedName) { setSubError('Name (key) is required.'); return; }
-    if (!trimmedLabel) { setSubError('Label is required.'); return; }
+    if (!trimmedLabel) { setSubError('Name is required.'); return; }
     setSubError('');
     setSubAdding(true);
-    await onAddSubType({ name: trimmedName, label: trimmedLabel, account_type: accountType.id });
-    setNewSubName('');
+    await onAddSubType({ name: toKey(trimmedLabel), label: trimmedLabel, account_type: accountType.id });
     setNewSubLabel('');
     setSubAdding(false);
     setAddingSubType(false);
@@ -136,7 +133,7 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
   return (
     <Card className="p-5">
       {/* Type header */}
-      <div className="flex items-center gap-2 mb-1 group">
+      <div className="flex items-center gap-2 pb-3 border-b border-gray-100 group">
         {editingType ? (
           <>
             <input
@@ -164,11 +161,10 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
           </>
         ) : (
           <>
-            <span className="text-[11px] px-2 py-0.5 rounded-lg font-semibold ring-1 bg-teal-50 text-teal-700 ring-teal-200/60 shrink-0">
-              {accountType.name}
-            </span>
-            <p className="flex-1 text-sm font-semibold text-gray-700">{accountType.label}</p>
-            <span className="text-[11px] text-gray-400 font-medium">{subTypes.length} sub-types</span>
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-gray-800">{accountType.label}</h3>
+              <p className="text-[11px] text-gray-400 mt-0.5">{subTypes.length} {subTypes.length === 1 ? 'sub-type' : 'sub-types'}</p>
+            </div>
             <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => setEditingType(true)}
@@ -205,62 +201,52 @@ function AccountTypeSection({ accountType, onEditType, onDeleteType, onAddSubTyp
       </div>
 
       {/* Sub-types list */}
-      {subTypes.length === 0 ? (
-        <p className="text-sm text-gray-400 py-3 pl-6">No sub-types yet.</p>
-      ) : (
-        <div className="divide-y divide-gray-100">
-          {subTypes.map((st) => (
-            <SubTypeRow key={st.id} subType={st} onEdit={onEditSubType} onDelete={onDeleteSubType} />
-          ))}
-        </div>
-      )}
+      <div className="mt-2">
+        {subTypes.length === 0 ? (
+          <p className="text-sm text-gray-400 py-3">No sub-types yet.</p>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {subTypes.map((st) => (
+              <SubTypeRow key={st.id} subType={st} onEdit={onEditSubType} onDelete={onDeleteSubType} />
+            ))}
+          </div>
+        )}
 
-      {/* Add sub-type */}
-      {addingSubType ? (
-        <div className="mt-3 pl-6 flex flex-wrap gap-2 items-end">
-          <div className="flex-1 min-w-0">
-            <label className="block text-[11px] font-medium text-gray-400 mb-1">Name (key)</label>
+        {/* Add sub-type */}
+        {addingSubType ? (
+          <div className="mt-2 flex flex-wrap gap-2">
             <input
               autoFocus
-              value={newSubName}
-              onChange={(e) => setNewSubName(e.target.value)}
-              placeholder="e.g. savings"
-              className={`w-full ${inputClass}`}
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <label className="block text-[11px] font-medium text-gray-400 mb-1">Label</label>
-            <input
               value={newSubLabel}
               onChange={(e) => setNewSubLabel(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddSubType()}
               placeholder="e.g. Savings Account"
-              className={`w-full ${inputClass}`}
+              className={`flex-1 min-w-0 ${inputClass}`}
             />
+            <button
+              onClick={handleAddSubType}
+              disabled={subAdding}
+              className="text-xs px-4 py-2 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 transition-colors"
+            >
+              {subAdding ? '...' : 'Add'}
+            </button>
+            <button
+              onClick={() => { setAddingSubType(false); setNewSubLabel(''); setSubError(''); }}
+              className="text-xs px-4 py-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            {subError && <p className="w-full text-xs text-rose-500 font-medium">{subError}</p>}
           </div>
+        ) : (
           <button
-            onClick={handleAddSubType}
-            disabled={subAdding}
-            className="text-xs px-4 py-2 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 transition-colors"
+            onClick={() => setAddingSubType(true)}
+            className="mt-1 text-xs text-teal-600 hover:text-teal-700 font-semibold hover:bg-teal-50 px-2 py-1.5 -ml-2 rounded-lg transition-colors"
           >
-            {subAdding ? '...' : 'Add'}
+            + Add Sub-Type
           </button>
-          <button
-            onClick={() => { setAddingSubType(false); setNewSubName(''); setNewSubLabel(''); setSubError(''); }}
-            className="text-xs px-4 py-2 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 font-medium transition-colors"
-          >
-            Cancel
-          </button>
-          {subError && <p className="w-full text-xs text-rose-500 font-medium">{subError}</p>}
-        </div>
-      ) : (
-        <button
-          onClick={() => setAddingSubType(true)}
-          className="mt-2 ml-6 text-xs text-teal-600 hover:text-teal-700 font-semibold hover:bg-teal-50 px-3 py-1.5 rounded-lg transition-colors"
-        >
-          + Add Sub-Type
-        </button>
-      )}
+        )}
+      </div>
     </Card>
   );
 }
@@ -280,20 +266,20 @@ export default function AccountTypeManager() {
     deleteAccountSubType,
   } = useData();
 
-  const [newName, setNewName]   = useState('');
   const [newLabel, setNewLabel] = useState('');
   const [adding, setAdding]     = useState(false);
   const [error, setError]       = useState('');
 
+  function toKey(label) {
+    return label.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  }
+
   async function handleAdd() {
-    const trimmedName = newName.trim();
     const trimmedLabel = newLabel.trim();
-    if (!trimmedName) { setError('Name (key) is required.'); return; }
-    if (!trimmedLabel) { setError('Label is required.'); return; }
+    if (!trimmedLabel) { setError('Name is required.'); return; }
     setError('');
     setAdding(true);
-    await addAccountType({ name: trimmedName, label: trimmedLabel });
-    setNewName('');
+    await addAccountType({ name: toKey(trimmedLabel), label: trimmedLabel });
     setNewLabel('');
     setAdding(false);
   }
@@ -305,16 +291,10 @@ export default function AccountTypeManager() {
         <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">Add Account Type</p>
         <div className="flex flex-wrap gap-2">
           <input
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            placeholder="Name (key), e.g. asset"
-            className={`flex-1 min-w-0 ${inputClass}`}
-          />
-          <input
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            placeholder="Label, e.g. Asset"
+            placeholder="e.g. Asset"
             className={`flex-1 min-w-0 ${inputClass}`}
           />
           <button

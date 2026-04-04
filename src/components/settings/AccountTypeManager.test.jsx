@@ -76,13 +76,12 @@ describe('AccountTypeManager', () => {
       expect(screen.getByText('Add Account Type')).toBeInTheDocument();
     });
 
-    // Click Add without filling anything
     await user.click(screen.getByRole('button', { name: /^add$/i }));
-    expect(screen.getByText('Name (key) is required.')).toBeInTheDocument();
+    expect(screen.getByText('Name is required.')).toBeInTheDocument();
     expect(mockApi.createAccountType).not.toHaveBeenCalled();
   });
 
-  it('validates label is required when adding account type', async () => {
+  it('calls API to add account type with valid input and auto-generates key', async () => {
     const user = userEvent.setup();
     renderAccountTypeManager();
 
@@ -90,23 +89,7 @@ describe('AccountTypeManager', () => {
       expect(screen.getByText('Add Account Type')).toBeInTheDocument();
     });
 
-    // Fill name but not label
-    await user.type(screen.getByPlaceholderText(/name.*key/i), 'equity');
-    await user.click(screen.getByRole('button', { name: /^add$/i }));
-    expect(screen.getByText('Label is required.')).toBeInTheDocument();
-    expect(mockApi.createAccountType).not.toHaveBeenCalled();
-  });
-
-  it('calls API to add account type with valid input', async () => {
-    const user = userEvent.setup();
-    renderAccountTypeManager();
-
-    await waitFor(() => {
-      expect(screen.getByText('Add Account Type')).toBeInTheDocument();
-    });
-
-    await user.type(screen.getByPlaceholderText(/name.*key/i), 'equity');
-    await user.type(screen.getByPlaceholderText(/label/i), 'Equity');
+    await user.type(screen.getByPlaceholderText(/e\.g\. asset/i), 'Equity');
     await user.click(screen.getByRole('button', { name: /^add$/i }));
 
     await waitFor(() => {
@@ -119,7 +102,7 @@ describe('AccountTypeManager', () => {
 
     await waitFor(() => {
       expect(screen.getByText('2 sub-types')).toBeInTheDocument(); // asset has 2
-      expect(screen.getByText('1 sub-types')).toBeInTheDocument(); // liability has 1
+      expect(screen.getByText('1 sub-type')).toBeInTheDocument(); // liability has 1
     });
   });
 
@@ -140,10 +123,8 @@ describe('AccountTypeManager', () => {
       expect(screen.getAllByText('+ Add Sub-Type')).toHaveLength(2);
     });
 
-    // Click the first "+ Add Sub-Type" button
     await user.click(screen.getAllByText('+ Add Sub-Type')[0]);
 
-    expect(screen.getByPlaceholderText('e.g. savings')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('e.g. Savings Account')).toBeInTheDocument();
   });
 });

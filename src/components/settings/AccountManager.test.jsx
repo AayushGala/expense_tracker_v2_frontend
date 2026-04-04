@@ -105,7 +105,7 @@ describe('AccountManager', () => {
     });
   });
 
-  it('shows "No accounts found" when there are no accounts', async () => {
+  it('shows "No accounts yet" when there are no accounts in a group', async () => {
     mockApi = createMockApi({
       getAllData: vi.fn().mockResolvedValue({ ...MOCK_ALL_DATA, accounts: [] }),
     });
@@ -113,7 +113,9 @@ describe('AccountManager', () => {
     renderAccountManager();
 
     await waitFor(() => {
-      expect(screen.getByText('No accounts found.')).toBeInTheDocument();
+      // Each type group card shows its own empty state
+      const emptyMessages = screen.getAllByText('No accounts yet.');
+      expect(emptyMessages.length).toBeGreaterThanOrEqual(1);
     });
   });
 

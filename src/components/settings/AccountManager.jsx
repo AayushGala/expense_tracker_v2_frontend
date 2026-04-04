@@ -1,19 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Card from '../common/Card';
 import Dropdown from '../common/Dropdown';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 
-// Account types and sub-types are now loaded dynamically from the API via DataContext.
-
 const inputClass =
   'text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 hover:border-gray-300 transition-colors';
 
-const TYPE_BADGE_COLORS = {
-  asset:      'bg-emerald-50 text-emerald-700 ring-emerald-200/60',
-  liability:  'bg-rose-50 text-rose-600 ring-rose-200/60',
-  receivable: 'bg-sky-50 text-sky-700 ring-sky-200/60',
-};
+// ---------------------------------------------------------------------------
+// Account Row
+// ---------------------------------------------------------------------------
 
 function AccountRow({ account, hasEntries, onUpdate, owners }) {
   const [editing, setEditing]     = useState(false);
@@ -38,16 +34,9 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
   }
 
   const isInactive = account.is_active === false;
-  const badgeColor = TYPE_BADGE_COLORS[account.type] ?? 'bg-gray-50 text-gray-600 ring-gray-200/60';
 
   return (
-    <div className={`flex items-center gap-2.5 py-3 group ${isInactive ? 'opacity-40' : ''}`}>
-      {/* Type badge */}
-      <span className={`text-[11px] px-2 py-0.5 rounded-lg font-semibold ring-1 capitalize shrink-0 ${badgeColor}`}>
-        {account.type}
-      </span>
-
-      {/* Name */}
+    <div className={`flex items-center gap-2.5 py-2.5 group ${isInactive ? 'opacity-40' : ''}`}>
       {editing ? (
         <>
           <input
@@ -76,9 +65,12 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
         </>
       ) : (
         <>
-          <span className="flex-1 text-sm font-medium text-gray-700 truncate">
+          <span className="flex-1 text-[13px] text-gray-700 truncate">
             {account.name}
           </span>
+          {account.sub_type && (
+            <span className="text-[11px] text-gray-400 shrink-0">{account.sub_type}</span>
+          )}
           {owners.length > 0 && (
             <select
               value={account.owner || ''}
@@ -93,7 +85,7 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
               ))}
             </select>
           )}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setEditing(true)}
               className="text-xs text-gray-400 hover:text-teal-600 px-2 py-1 rounded-lg hover:bg-teal-50 font-medium transition-colors shrink-0"
@@ -118,6 +110,49 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Account Group Card (one per account type)
+// ---------------------------------------------------------------------------
+
+function AccountGroupCard({ typeLabel, accounts, accountsWithEntries, onUpdate, owners }) {
+  const sorted = useMemo(
+    () => [...accounts].sort((a, b) => a.name.localeCompare(b.name)),
+    [accounts]
+  );
+
+  return (
+    <Card className="p-5">
+      <div className="pb-3 border-b border-gray-100">
+        <h3 className="text-base font-bold text-gray-800">{typeLabel}</h3>
+        <p className="text-[11px] text-gray-400 mt-0.5">
+          {sorted.length} {sorted.length === 1 ? 'account' : 'accounts'}
+        </p>
+      </div>
+      <div className="mt-2">
+        {sorted.length === 0 ? (
+          <p className="text-sm text-gray-400 py-3">No accounts yet.</p>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {sorted.map((account) => (
+              <AccountRow
+                key={account.id}
+                account={account}
+                hasEntries={accountsWithEntries.has(account.id)}
+                onUpdate={onUpdate}
+                owners={owners}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main Component
+// ---------------------------------------------------------------------------
 
 export default function AccountManager() {
   const { accounts, entries, accountTypes, addAccount, updateAccount } = useData();
@@ -144,6 +179,23 @@ export default function AccountManager() {
 
   const accountsWithEntries = new Set(entries.map((e) => e.account_id));
 
+  // Group accounts by type label
+  const groupedByType = useMemo(() => {
+    const groups = new Map();
+    for (const at of accountTypes) {
+      groups.set(at.label, []);
+    }
+    for (const account of accounts) {
+      const typeLabel = account.type;
+      // Find the matching account type label (type is normalized to type_name string)
+      const atObj = accountTypes.find((t) => t.name === typeLabel || t.label === typeLabel);
+      const label = atObj?.label ?? typeLabel;
+      if (!groups.has(label)) groups.set(label, []);
+      groups.get(label).push(account);
+    }
+    return groups;
+  }, [accounts, accountTypes]);
+
   async function handleAdd() {
     const trimmed = newName.trim();
     if (!trimmed) { setError('Name is required.'); return; }
@@ -160,8 +212,6 @@ export default function AccountManager() {
     setNewName('');
     setAdding(false);
   }
-
-  const allAccounts = accounts;
 
   return (
     <div className="space-y-6">
@@ -205,33 +255,17 @@ export default function AccountManager() {
         {error && <p className="text-xs text-rose-500 font-medium mt-2">{error}</p>}
       </Card>
 
-      {/* Account list */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-            All Accounts
-          </p>
-          <span className="text-[11px] text-gray-400 font-medium">{allAccounts.length} items</span>
-        </div>
-        <p className="text-xs text-gray-400 mb-3">
-          Accounts with transactions can be deactivated but not deleted.
-        </p>
-        {allAccounts.length === 0 ? (
-          <p className="text-sm text-gray-400 py-4 text-center">No accounts found.</p>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {allAccounts.map((account) => (
-              <AccountRow
-                key={account.id}
-                account={account}
-                hasEntries={accountsWithEntries.has(account.id)}
-                onUpdate={updateAccount}
-                owners={owners}
-              />
-            ))}
-          </div>
-        )}
-      </Card>
+      {/* Grouped account cards */}
+      {[...groupedByType.entries()].map(([typeLabel, typeAccounts]) => (
+        <AccountGroupCard
+          key={typeLabel}
+          typeLabel={typeLabel}
+          accounts={typeAccounts}
+          accountsWithEntries={accountsWithEntries}
+          onUpdate={updateAccount}
+          owners={owners}
+        />
+      ))}
     </div>
   );
 }
