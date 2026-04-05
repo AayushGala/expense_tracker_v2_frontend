@@ -19,18 +19,33 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
   const assetAccounts = accounts.filter((a) => a.type === 'asset');
   const receivableAccount = accounts.find((a) => a.type === 'receivable') ?? null;
 
-  // Only pending or partially settled receivables
-  const pendingReceivables = useMemo(
+  const isEditing = Boolean(initialData);
+
+  // When editing, show all receivables so the settled one can be displayed.
+  // When creating, only show pending/partial.
+  const availableReceivables = useMemo(
     () =>
       (receivables ?? []).filter(
-        (r) => r.status === 'pending' || r.status === 'partial'
+        (r) => isEditing || r.status === 'pending' || r.status === 'partial'
       ),
-    [receivables]
+    [receivables, isEditing]
   );
+
+  // Try to find the receivable that was settled by this transaction
+  const initialReceivableId = useMemo(() => {
+    if (!initialData) return '';
+    // Match by: receivable whose original transaction's receivables
+    // include one with amount matching this reimbursement
+    const amount = initialData.amount;
+    const match = (receivables ?? []).find(
+      (r) => r.amount_settled > 0 && Math.abs(r.amount_settled - amount) < 0.01
+    );
+    return match ? String(match.id) : '';
+  }, [initialData, receivables]);
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [selectedReceivableId, setSelectedReceivableId] = useState('');
+  const [selectedReceivableId, setSelectedReceivableId] = useState(initialReceivableId);
   const [amount, setAmount] = useState(initialData?.amount ?? '');
   const [date, setDate] = useState(initialData?.date ?? today);
   const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
@@ -39,17 +54,20 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
   const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
-  const selectedReceivable = pendingReceivables.find(
+  const selectedReceivable = availableReceivables.find(
     (r) => String(r.id) === String(selectedReceivableId)
   ) ?? null;
 
-  const outstanding = selectedReceivable
+  // When editing, add back this transaction's original amount since it will be re-settled
+  const previousAmount = isEditing ? (initialData?.amount ?? 0) : 0;
+  const currentOutstanding = selectedReceivable
     ? Math.round(
         ((selectedReceivable.amount_owed ?? 0) -
           (selectedReceivable.amount_settled ?? 0)) *
           100
       ) / 100
     : 0;
+  const outstanding = Math.round((currentOutstanding + previousAmount) * 100) / 100;
 
   function validate() {
     const errs = {};
@@ -97,7 +115,7 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {pendingReceivables.length === 0 ? (
+      {availableReceivables.length === 0 ? (
         <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-6 text-center text-sm text-gray-500">
           No pending receivables found.
         </div>
@@ -113,9 +131,12 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
                 setAmount('');
                 setErrors({});
               }}
-              options={pendingReceivables.map((r) => {
+              options={availableReceivables.map((r) => {
                 const owed = (r.amount_owed ?? 0) - (r.amount_settled ?? 0);
-                return { value: String(r.id), label: `${r.person_name} — ${formatINR(owed)} outstanding` };
+                const effective = isEditing && String(r.id) === initialReceivableId
+                  ? Math.round((owed + previousAmount) * 100) / 100
+                  : owed;
+                return { value: String(r.id), label: `${r.person_name} — ${formatINR(effective)} outstanding` };
               })}
               placeholder="Choose a person"
             />
@@ -124,12 +145,11 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
             )}
           </div>
 
-          {/* Outstanding info */}
-          {selectedReceivable && (
-            <div className="rounded-lg bg-cyan-50 border border-cyan-200 px-3 py-2 text-xs text-cyan-800">
-              <span className="font-semibold">{selectedReceivable.person_name}</span>{' '}
-              owes you <span className="font-bold">{formatINR(outstanding)}</span>
-              {selectedReceivable.notes ? ` — ${selectedReceivable.notes}` : ''}
+          {/* Edit context note */}
+          {isEditing && selectedReceivable && previousAmount > 0 && (
+            <div className="rounded-lg bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-500">
+              This reimbursement previously settled <span className="font-semibold text-gray-700">{formatINR(previousAmount)}</span>.
+              Total outstanding including this transaction: <span className="font-semibold text-gray-700">{formatINR(outstanding)}</span>
             </div>
           )}
 
