@@ -106,6 +106,43 @@ export default function OwnerSettings() {
           )}
         </div>
       </Card>
+
+      {/* Owner guide */}
+      <Card className="p-5">
+        <div className="pb-3 border-b border-gray-100 mb-4">
+          <h3 className="text-base font-bold text-gray-800">Owner Guide</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            Who should be set as the owner for each transaction type.
+          </p>
+        </div>
+        <div className="rounded-xl ring-1 ring-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50/80">
+              <tr>
+                <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Transaction Type</th>
+                <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Owner should be</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[
+                ['Expense', 'Who the expense belongs to (not necessarily who paid)'],
+                ['Income', 'Who earned it (e.g. whose salary, whose cashback)'],
+                ['Transfer', 'Either person or blank — it\'s just money moving'],
+                ['Bill Payment', 'Who the credit card/loan belongs to'],
+                ['Investment', 'Who the investment is for'],
+                ['Cashback', 'Who earned the reward (whose card/purchase triggered it)'],
+                ['Split Expense', 'Who paid the bill upfront'],
+                ['Reimbursement', 'Who is receiving the money back'],
+              ].map(([type, desc]) => (
+                <tr key={type} className="bg-white">
+                  <td className="px-4 py-2.5 font-medium text-gray-700 whitespace-nowrap">{type}</td>
+                  <td className="px-4 py-2.5 text-gray-500">{desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
