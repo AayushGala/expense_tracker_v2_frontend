@@ -102,9 +102,6 @@ const api = {
   getTransactionTags: () => request('GET', '/api/transactions/tags/'),
   getTransactionPlatforms: () => request('GET', '/api/transactions/platforms/'),
 
-  // Entries
-  getEntries: () => request('GET', '/api/entries/'),
-
   // Receivables
   getReceivables: (params) => {
     const qs = params ? new URLSearchParams(params).toString() : '';

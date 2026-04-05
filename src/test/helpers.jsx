@@ -79,7 +79,6 @@ export function createMockApi(overrides = {}) {
     createTransaction: vi.fn().mockResolvedValue({ id: 1, entries: [], receivables: [] }),
     updateTransaction: vi.fn().mockResolvedValue({ id: 1, entries: [] }),
     deleteTransaction: vi.fn().mockResolvedValue(null),
-    getEntries: vi.fn().mockResolvedValue([]),
     getReceivables: vi.fn().mockResolvedValue([]),
     updateReceivable: vi.fn().mockResolvedValue({}),
     getBudgets: vi.fn().mockResolvedValue([]),

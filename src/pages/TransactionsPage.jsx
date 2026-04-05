@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions } from '../hooks/useTransactions';
+import { useServerTransactions } from '../hooks/useServerTransactions';
 import { useData } from '../context/DataContext';
 import FilterBar from '../components/common/FilterBar';
 import Badge from '../components/common/Badge';
@@ -154,7 +154,7 @@ function TransactionCard({ txn, onClick }) {
 // Pagination
 // ---------------------------------------------------------------------------
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 50; // matches backend DRF PAGE_SIZE
 
 function Pagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) return null;
@@ -230,23 +230,25 @@ export default function TransactionsPage() {
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { filteredTransactions, getTransactionEntries } = useTransactions(filters);
+  const {
+    transactions: paginatedTxns,
+    totalCount,
+    isLoading: txnLoading,
+    refetch,
+    getTransactionEntries,
+  } = useServerTransactions(filters, currentPage);
 
-  const totalPages = Math.ceil(filteredTransactions.length / PAGE_SIZE);
-  const paginatedTxns = filteredTransactions.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-  function handleFilterChange(key, value) {
+  const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
-  }
+  }, []);
 
-  function handleReset() {
+  const handleReset = useCallback(() => {
     setFilters(EMPTY_FILTERS);
     setCurrentPage(1);
-  }
+  }, []);
 
   function handleRowClick(txn) {
     setSelectedTxn(txn);
@@ -282,7 +284,7 @@ export default function TransactionsPage() {
       </Card>
 
       {/* Content */}
-      {filteredTransactions.length === 0 ? (
+      {paginatedTxns.length === 0 ? (
         <EmptyState
           message="No transactions found"
           description="Try adjusting your filters or add a new transaction."
@@ -300,7 +302,7 @@ export default function TransactionsPage() {
           <div className="flex items-center justify-between px-4 md:px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-bold text-gray-900">Recent Activity</h2>
             <p className="text-xs text-gray-400">
-              {paginatedTxns.length} of {filteredTransactions.length}
+              {paginatedTxns.length} of {totalCount}
             </p>
           </div>
 
@@ -362,7 +364,7 @@ export default function TransactionsPage() {
             transaction={selectedTxn}
             entries={getTransactionEntries(selectedTxn.id)}
             onClose={handleModalClose}
-            onDeleted={() => setSelectedTxn(null)}
+            onDeleted={() => { setSelectedTxn(null); refetch(); }}
           />
         )}
       </Modal>

@@ -1,7 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Card from '../common/Card';
 import { useData } from '../../context/DataContext';
 import { formatINR, formatDate } from '../../utils/formatters';
+
+const STATUS_TABS = [
+  { value: '', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'partial', label: 'Partial' },
+  { value: 'settled', label: 'Settled' },
+];
 
 function agingDays(dateStr) {
   if (!dateStr) return 0;
@@ -41,10 +48,18 @@ const STATUS_ORDER = { pending: 0, partial: 1, waived: 2, settled: 3, paid: 4 };
 
 export default function ReceivablesReport() {
   const { receivables } = useData();
+  const [statusFilter, setStatusFilter] = useState('');
+
+  const filteredReceivables = useMemo(
+    () => statusFilter
+      ? receivables.filter((r) => r.status === statusFilter)
+      : receivables,
+    [receivables, statusFilter]
+  );
 
   const rows = useMemo(
     () =>
-      receivables
+      filteredReceivables
         .map((r) => {
           const amount    = r.amount_owed ?? 0;
           const settled   = r.amount_settled ?? 0;
@@ -67,6 +82,21 @@ export default function ReceivablesReport() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 min-h-[44px]">
         <h2 className="text-base font-bold text-gray-900 flex-1">Receivables</h2>
+        <div className="flex items-center gap-1">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setStatusFilter(tab.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                statusFilter === tab.value
+                  ? 'bg-[#1e2a30] text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Summary */}
