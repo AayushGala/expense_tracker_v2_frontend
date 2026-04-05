@@ -19,10 +19,10 @@ function agingDays(dateStr) {
 
 function statusBadge(status) {
   const map = {
-    pending:  'bg-yellow-100 text-yellow-800',
-    partial:  'bg-blue-100 text-blue-800',
-    settled:  'bg-green-100 text-green-800',
-    paid:     'bg-green-100 text-green-800',
+    pending:  'bg-[#1e2a30]/10 text-[#1e2a30]',
+    partial:  'bg-[#c5f1ec] text-[#1e2a30]',
+    settled:  'bg-gray-100 text-gray-600',
+    paid:     'bg-gray-100 text-gray-600',
     waived:   'bg-gray-100 text-gray-600',
   };
   const cls = map[status] ?? 'bg-gray-100 text-gray-600';
@@ -34,9 +34,9 @@ function statusBadge(status) {
 }
 
 function agingBadge(days) {
-  let cls = 'bg-green-50 text-green-700';
-  if (days > 90) cls = 'bg-red-100 text-red-700';
-  else if (days > 30) cls = 'bg-orange-100 text-orange-700';
+  let cls = 'bg-[#c5f1ec] text-[#1e2a30]';
+  if (days > 90) cls = 'bg-[#1e2a30] text-white';
+  else if (days > 30) cls = 'bg-[#1e2a30]/10 text-[#1e2a30]';
   return (
     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>
       {days}d
@@ -72,7 +72,7 @@ export default function ReceivablesReport() {
           if (so !== 0) return so;
           return b._days - a._days; // older first within same status
         }),
-    [receivables]
+    [filteredReceivables]
   );
 
   const totalOwed       = useMemo(() => rows.reduce((s, r) => s + r._amount, 0), [rows]);
@@ -107,7 +107,7 @@ export default function ReceivablesReport() {
         </Card>
         <Card className="p-4">
           <p className="text-xs text-gray-500">Outstanding</p>
-          <p className="text-base font-bold text-orange-600 mt-0.5">{formatINR(totalOutstanding)}</p>
+          <p className="text-base font-bold text-gray-800 mt-0.5">{formatINR(totalOutstanding)}</p>
         </Card>
       </div>
 
@@ -139,10 +139,10 @@ export default function ReceivablesReport() {
                     <td className="px-4 py-3 text-gray-700 whitespace-nowrap">
                       {formatINR(r._amount)}
                     </td>
-                    <td className="px-4 py-3 text-green-700 whitespace-nowrap">
+                    <td className="px-4 py-3 text-[#2cbcac] whitespace-nowrap">
                       {formatINR(r._settled)}
                     </td>
-                    <td className="px-4 py-3 font-semibold text-orange-600 whitespace-nowrap">
+                    <td className="px-4 py-3 font-semibold text-gray-800 whitespace-nowrap">
                       {formatINR(r._outstanding)}
                     </td>
                     <td className="px-4 py-3">{statusBadge(r.status)}</td>

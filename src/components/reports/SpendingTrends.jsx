@@ -96,8 +96,8 @@ export default function SpendingTrends() {
       </div>
 
       {/* Chart */}
-      <Card>
-        <ResponsiveContainer width="100%" height={260}>
+      <Card className="p-5">
+        <ResponsiveContainer width="100%" height={280}>
           <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis

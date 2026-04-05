@@ -112,11 +112,11 @@ export default function CategoryDeepDive() {
       </div>
 
       {/* Trend chart */}
-      <Card>
+      <Card className="p-5">
         <p className="text-sm font-medium text-gray-600 mb-3">
           Monthly spend — {categoryName}
         </p>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={260}>
           <LineChart data={trendData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
@@ -146,14 +146,14 @@ export default function CategoryDeepDive() {
       </Card>
 
       {/* Transaction list */}
-      <Card>
+      <Card className="p-5">
         <p className="text-sm font-medium text-gray-600 mb-3">
           Transactions ({filteredTransactions.length})
         </p>
         {filteredTransactions.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-6">No transactions found.</p>
         ) : (
-          <div className="divide-y divide-gray-100 -mx-6 px-6 max-h-72 overflow-y-auto">
+          <div className="divide-y divide-gray-100 -mx-6 px-6 max-h-80 overflow-y-auto">
             {filteredTransactions.map((txn) => (
               <div key={txn.id} className="flex items-center justify-between py-2.5 gap-2">
                 <div className="min-w-0">
@@ -162,7 +162,7 @@ export default function CategoryDeepDive() {
                   </p>
                   <p className="text-xs text-gray-400">{formatDate(txn.date)}</p>
                 </div>
-                <p className="text-sm font-semibold text-red-600 whitespace-nowrap">
+                <p className="text-sm font-semibold text-gray-800 whitespace-nowrap">
                   {formatINR(txn.amount ?? 0)}
                 </p>
               </div>

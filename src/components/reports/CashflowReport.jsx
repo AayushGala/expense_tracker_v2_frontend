@@ -82,10 +82,10 @@ export default function CashflowReport() {
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Income',      value: totals.income,      color: 'text-green-600' },
-          { label: 'Total Expenses',    value: totals.expenses,    color: 'text-red-600' },
-          { label: 'Total Investments', value: totals.investments, color: 'text-purple-600' },
-          { label: 'Net Savings',       value: netSavings,         color: netSavings >= 0 ? 'text-green-600' : 'text-red-600' },
+          { label: 'Total Income',      value: totals.income,      color: 'text-[#2cbcac]' },
+          { label: 'Total Expenses',    value: totals.expenses,    color: 'text-gray-800' },
+          { label: 'Total Investments', value: totals.investments, color: 'text-gray-500' },
+          { label: 'Net Savings',       value: netSavings,         color: netSavings >= 0 ? 'text-[#2cbcac]' : 'text-gray-800' },
         ].map((s) => (
           <Card key={s.label} className="p-4">
             <p className="text-xs text-gray-500">{s.label}</p>
@@ -97,8 +97,8 @@ export default function CashflowReport() {
       </div>
 
       {/* Chart */}
-      <Card>
-        <ResponsiveContainer width="100%" height={300}>
+      <Card className="p-5">
+        <ResponsiveContainer width="100%" height={320}>
           <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 0 }} barCategoryGap="30%">
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
@@ -116,9 +116,9 @@ export default function CashflowReport() {
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="income"      name="Income"      fill="#22c55e" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="expenses"    name="Expenses"    fill="#ef4444" radius={[3, 3, 0, 0]} />
-            <Bar dataKey="investments" name="Investments" fill="#a855f7" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="income"      name="Income"      fill="#2cbcac" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="expenses"    name="Expenses"    fill="#1e2a30" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="investments" name="Investments" fill="#7c9a9e" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>

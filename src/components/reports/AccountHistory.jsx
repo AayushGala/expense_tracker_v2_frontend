@@ -76,13 +76,13 @@ export default function AccountHistory() {
       <div className="grid grid-cols-3 gap-3">
         <Card className="p-4">
           <p className="text-xs text-gray-500">Current Balance</p>
-          <p className={`text-base font-bold mt-0.5 ${currentBalance >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
+          <p className={`text-base font-bold mt-0.5 ${currentBalance >= 0 ? 'text-gray-900' : 'text-gray-800'}`}>
             {formatINR(currentBalance)}
           </p>
         </Card>
         <Card className="p-4">
           <p className="text-xs text-gray-500">Lowest Balance</p>
-          <p className={`text-base font-bold mt-0.5 ${minBalance >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
+          <p className={`text-base font-bold mt-0.5 ${minBalance >= 0 ? 'text-gray-900' : 'text-gray-800'}`}>
             {formatINR(minBalance)}
           </p>
         </Card>
@@ -93,7 +93,7 @@ export default function AccountHistory() {
       </div>
 
       {/* Chart */}
-      <Card>
+      <Card className="p-5">
         <p className="text-sm font-medium text-gray-600 mb-3">
           Balance over time — {selectedAccount?.name ?? ''}
         </p>
@@ -102,7 +102,7 @@ export default function AccountHistory() {
             No transactions found for this account.
           </p>
         ) : (
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis
@@ -120,7 +120,7 @@ export default function AccountHistory() {
                 width={52}
               />
               <Tooltip content={<CustomTooltip />} />
-              {minBalance < 0 && <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="4 4" />}
+              {minBalance < 0 && <ReferenceLine y={0} stroke="#1e2a30" strokeDasharray="4 4" />}
               <Line
                 type="stepAfter"
                 dataKey="balance"
@@ -136,11 +136,11 @@ export default function AccountHistory() {
 
       {/* Recent ledger entries */}
       {ledger.length > 0 && (
-        <Card>
+        <Card className="p-5">
           <p className="text-sm font-medium text-gray-600 mb-3">
             Recent entries ({ledger.length})
           </p>
-          <div className="divide-y divide-gray-100 -mx-6 px-6 max-h-64 overflow-y-auto">
+          <div className="divide-y divide-gray-100 -mx-6 px-6 max-h-80 overflow-y-auto">
             {[...ledger].reverse().map((entry) => (
               <div key={entry.id} className="flex items-center justify-between py-2.5 gap-2">
                 <div className="min-w-0">
@@ -148,7 +148,7 @@ export default function AccountHistory() {
                   <p className="text-xs text-gray-500">{entry.entry_type}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-sm font-semibold ${entry.entry_type === 'DEBIT' ? 'text-red-600' : 'text-green-600'}`}>
+                  <p className={`text-sm font-semibold ${entry.entry_type === 'DEBIT' ? 'text-[#2cbcac]' : 'text-gray-800'}`}>
                     {entry.entry_type === 'DEBIT' ? '-' : '+'}{formatINR(entry.amount)}
                   </p>
                   <p className="text-xs text-gray-400">Bal: {formatINR(entry.runningBalance)}</p>
