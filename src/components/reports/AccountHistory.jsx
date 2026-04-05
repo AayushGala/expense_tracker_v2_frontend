@@ -58,7 +58,7 @@ export default function AccountHistory() {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 min-h-[44px]">
         <h2 className="text-base font-bold text-gray-900 flex-1">Account History</h2>
         <Dropdown
           value={selectedAccountId}

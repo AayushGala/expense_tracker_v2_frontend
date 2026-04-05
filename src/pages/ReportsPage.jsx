@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import SpendingTrends from '../components/reports/SpendingTrends';
 import CashflowReport from '../components/reports/CashflowReport';
-import CategoryDeepDive from '../components/reports/CategoryDeepDive';
 import AccountHistory from '../components/reports/AccountHistory';
 import ReceivablesReport from '../components/reports/ReceivablesReport';
 
 const TABS = [
-  { id: 'spending',    label: 'Spending Trends' },
+  { id: 'spending',    label: 'Spending' },
   { id: 'cashflow',   label: 'Cashflow' },
-  { id: 'category',   label: 'Category Deep-Dive' },
   { id: 'account',    label: 'Account History' },
   { id: 'receivables',label: 'Receivables' },
 ];
@@ -41,13 +39,12 @@ export default function ReportsPage() {
         ))}
       </div>
 
-      {/* Tab panels — negative margin to tighten gap to match inner spacing */}
+      {/* Tab panels — hidden keeps components mounted to preserve state */}
       <div className="-mt-2">
-        {activeTab === 'spending'    && <SpendingTrends />}
-        {activeTab === 'cashflow'    && <CashflowReport />}
-        {activeTab === 'category'    && <CategoryDeepDive />}
-        {activeTab === 'account'     && <AccountHistory />}
-        {activeTab === 'receivables' && <ReceivablesReport />}
+        <div className={activeTab !== 'spending'    ? 'hidden' : ''}><SpendingTrends /></div>
+        <div className={activeTab !== 'cashflow'    ? 'hidden' : ''}><CashflowReport /></div>
+        <div className={activeTab !== 'account'     ? 'hidden' : ''}><AccountHistory /></div>
+        <div className={activeTab !== 'receivables' ? 'hidden' : ''}><ReceivablesReport /></div>
       </div>
     </div>
   );

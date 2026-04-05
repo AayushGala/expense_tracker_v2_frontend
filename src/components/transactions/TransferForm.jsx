@@ -4,6 +4,7 @@ import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
 import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { formatINR } from '../../utils/formatters';
 
 /**
  * Form for recording a transfer between two asset/liability accounts.
@@ -12,12 +13,14 @@ import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
  * @param {Function} props.onSubmit - Called with (transaction, entries)
  */
 export default function TransferForm({ onSubmit, initialData }) {
-  const { accounts } = useData();
+  const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
   const eligibleAccounts = accounts.filter(
     (a) => a.type === 'asset' || a.type === 'liability'
   );
+
+  const expenseCategories = categories.filter((c) => c.type === 'expense');
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -25,6 +28,8 @@ export default function TransferForm({ onSubmit, initialData }) {
   const [date, setDate] = useState(initialData?.date ?? today);
   const [fromAccountId, setFromAccountId] = useState(String(initialData?.from_account_id ?? ''));
   const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
+  const [fee, setFee] = useState(initialData?.fee ?? '');
+  const [feeCategoryId, setFeeCategoryId] = useState(String(initialData?.fee_category_id ?? ''));
   const [owner, setOwner] = useState(initialData?.owner ?? '');
   const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
@@ -47,6 +52,13 @@ export default function TransferForm({ onSubmit, initialData }) {
     if (fromAccountId && toAccountId && fromAccountId === toAccountId) {
       errs.toAccountId = 'Source and destination must be different accounts.';
     }
+    const parsedFee = parseFloat(fee);
+    if (fee && (isNaN(parsedFee) || parsedFee < 0)) {
+      errs.fee = 'Enter a valid fee amount.';
+    }
+    if (parsedFee > 0 && !feeCategoryId) {
+      errs.feeCategory = 'Select a category for the fee.';
+    }
     return errs;
   }
 
@@ -59,8 +71,9 @@ export default function TransferForm({ onSubmit, initialData }) {
     }
 
     const parsedAmount = parseFloat(amount);
+    const parsedFee = parseFloat(fee) || 0;
 
-    onSubmit({
+    const payload = {
       type: 'transfer',
       amount: parsedAmount,
       date,
@@ -69,8 +82,19 @@ export default function TransferForm({ onSubmit, initialData }) {
       owner,
       platform: platform.trim(),
       notes: notes.trim(),
-    });
+    };
+
+    if (parsedFee > 0 && feeCategoryId) {
+      payload.fee = parsedFee;
+      payload.fee_category_id = parseInt(feeCategoryId);
+    }
+
+    onSubmit(payload);
   }
+
+  const parsedAmount = parseFloat(amount) || 0;
+  const parsedFee = parseFloat(fee) || 0;
+  const totalDebited = parsedAmount + parsedFee;
 
 
   return (
@@ -144,6 +168,45 @@ export default function TransferForm({ onSubmit, initialData }) {
           </div>
         )}
       </div>
+
+      {/* Fee (optional) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="txn-fee" className={labelClass}>Fee / Surcharge <span className="text-gray-400 font-normal">(optional)</span></label>
+          <div className="relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-300">₹</span>
+            <input
+              id="txn-fee"
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              value={fee}
+              onChange={(e) => setFee(e.target.value)}
+              className={`${inputClass} pl-8`}
+            />
+          </div>
+          {errors.fee && <p className={errorClass}>{errors.fee}</p>}
+        </div>
+
+        <div>
+          <label className={labelClass}>Fee Category</label>
+          <Select
+            value={feeCategoryId}
+            onChange={(e) => setFeeCategoryId(e.target.value)}
+            options={expenseCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+            placeholder="Select fee category"
+          />
+          {errors.feeCategory && <p className={errorClass}>{errors.feeCategory}</p>}
+        </div>
+      </div>
+
+      {parsedFee > 0 && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+          <span className="font-medium">Total debited:</span> {formatINR(totalDebited)} ({formatINR(parsedAmount)} transfer + {formatINR(parsedFee)} fee)
+        </div>
+      )}
 
       {/* Platform */}
       <div>
