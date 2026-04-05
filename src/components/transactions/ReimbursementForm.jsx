@@ -4,6 +4,7 @@ import { useOwners } from '../../hooks/useOwners';
 import { formatINR } from '../../utils/formatters';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
+import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
 
 /**
  * Form for recording reimbursement received from someone.
@@ -109,9 +110,6 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
     });
   }
 
-  const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 hover:border-gray-300 placeholder-gray-400';
-  const labelClass = 'block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5';
-  const errorClass = 'mt-1.5 text-xs text-rose-500 font-medium';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">

@@ -4,12 +4,7 @@ import { useData } from '../../context/DataContext';
 import { formatDate, formatINR, transactionTypeLabel } from '../../utils/formatters';
 import Badge from '../common/Badge';
 import AmountDisplay from '../common/AmountDisplay';
-
-function amountVariant(type) {
-  if (type === 'income' || type === 'cashback' || type === 'reimbursement') return 'income';
-  if (type === 'expense' || type === 'bill_payment' || type === 'split_expense') return 'expense';
-  return 'neutral';
-}
+import { getVariant } from '../common/TypeIcon';
 
 export default function TransactionDetail({
   transaction,
