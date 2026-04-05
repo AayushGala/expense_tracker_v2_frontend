@@ -193,7 +193,7 @@ export default function TransactionForm() {
       <Card className="p-6">
         {submitting ? (
           <div className="flex items-center justify-center py-16">
-            <div className="h-8 w-8 rounded-full border-[3px] border-[#1e2a30] border-t-transparent animate-spin" />
+            <div className="h-8 w-8 rounded-full border-[3px] border-brand border-t-transparent animate-spin" />
           </div>
         ) : (
           renderSubForm()

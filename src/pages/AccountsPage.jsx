@@ -48,8 +48,8 @@ function subTypeLabel(sub) {
 
 function AccountTypeBadge({ type, subType }) {
   const colors = {
-    asset:      'bg-[#c5f1ec] text-[#1e2a30] ring-[#2cbcac]/30',
-    liability:  'bg-[#1e2a30] text-white ring-[#1e2a30]/20',
+    asset:      'bg-accent-light text-brand ring-accent/30',
+    liability:  'bg-brand text-white ring-brand/20',
     receivable: 'bg-gray-100 text-gray-600 ring-gray-200/60',
   };
   return (
@@ -115,14 +115,14 @@ function AccountLedger({ account, ledger, transactions }) {
 
             {/* Badge */}
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-              isPositive ? 'bg-[#c5f1ec] text-[#1e2a30]' : 'bg-gray-200 text-gray-600'
+              isPositive ? 'bg-accent-light text-brand' : 'bg-gray-200 text-gray-600'
             }`}>
               {isDebit ? 'DR' : 'CR'}
             </span>
 
             {/* Amount */}
             <p className={`text-[15px] font-semibold tabular-nums shrink-0 ${
-              isPositive ? 'text-[#2cbcac]' : 'text-gray-800'
+              isPositive ? 'text-accent' : 'text-gray-800'
             }`}>
               {isPositive ? '+' : '-'}₹{entry.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
             </p>
@@ -150,8 +150,8 @@ const ACCOUNT_ICONS = {
 };
 
 const ACCOUNT_ICON_COLORS = {
-  asset:      'bg-[#c5f1ec] text-[#1e2a30]',
-  liability:  'bg-[#1e2a30]/10 text-[#1e2a30]',
+  asset:      'bg-accent-light text-brand',
+  liability:  'bg-brand/10 text-brand',
   receivable: 'bg-gray-100 text-gray-500',
 };
 
@@ -379,15 +379,15 @@ export default function AccountsPage() {
         {ledgerAccount && (
           <div className="flex flex-col gap-5">
             {/* Balance summary */}
-            <div className="flex items-center justify-between rounded-2xl bg-[#1e2a30] px-5 py-4">
+            <div className="flex items-center justify-between rounded-2xl bg-brand px-5 py-4">
               <div>
-                <p className="text-[11px] text-[#7a9a9e] font-medium uppercase tracking-wider">Current Balance</p>
+                <p className="text-[11px] text-brand-muted font-medium uppercase tracking-wider">Current Balance</p>
                 <p className="text-2xl font-bold text-white tabular-nums mt-1">
                   ₹{Math.abs(getAccountBalance(ledgerAccount.id)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[11px] text-[#7a9a9e] font-medium capitalize">{ledgerAccount.sub_type || ledgerAccount.type}</p>
+                <p className="text-[11px] text-brand-muted font-medium capitalize">{ledgerAccount.sub_type || ledgerAccount.type}</p>
                 <p className="text-[11px] text-[#556d72]">{ledgerAccount.currency ?? 'INR'}</p>
               </div>
             </div>

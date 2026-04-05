@@ -104,7 +104,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-[#2cbcac] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 placeholder-gray-300"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/20 placeholder-gray-300"
           />
         </div>
         {errors.amount && <p className={errorClass}>{errors.amount}</p>}
@@ -216,9 +216,9 @@ export default function ExpenseForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-[#1e2a30] px-4 py-3 text-sm font-bold
-                   text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none
-                   focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors active:bg-[#141e22]"
+        className="w-full rounded-xl bg-brand px-4 py-3 text-sm font-bold
+                   text-white shadow-sm hover:bg-brand-hover focus:outline-none
+                   focus:ring-2 focus:ring-accent/30 transition-colors active:bg-brand-deep"
       >
         {initialData ? 'Update Expense' : 'Save Expense'}
       </button>

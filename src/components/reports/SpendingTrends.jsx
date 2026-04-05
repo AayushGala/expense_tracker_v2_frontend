@@ -26,7 +26,7 @@ function CustomTooltip({ active, payload, label }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-md px-4 py-2 text-sm">
       <p className="font-medium text-gray-700 mb-1">{label}</p>
-      <p className="text-[#2cbcac] font-semibold">{formatINR(payload[0].value)}</p>
+      <p className="text-accent font-semibold">{formatINR(payload[0].value)}</p>
     </div>
   );
 }

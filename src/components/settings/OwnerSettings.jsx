@@ -41,7 +41,7 @@ export default function OwnerSettings() {
   }
 
   const inputClass =
-    'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-[#2cbcac] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/30 hover:border-gray-300 placeholder-gray-400';
+    'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-300 placeholder-gray-400';
 
   return (
     <div className="space-y-6">
@@ -82,7 +82,7 @@ export default function OwnerSettings() {
           <button
             type="button"
             onClick={handleAdd}
-            className="self-start inline-flex items-center gap-1.5 text-xs font-medium text-[#2cbcac] hover:text-[#1e2a30] rounded-lg px-2 py-1.5 hover:bg-[#c5f1ec]/30 transition-colors"
+            className="self-start inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:text-brand rounded-lg px-2 py-1.5 hover:bg-accent-light/30 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -95,7 +95,7 @@ export default function OwnerSettings() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-xl bg-[#1e2a30] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors disabled:opacity-60"
+            className="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-brand-hover focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors disabled:opacity-60"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>

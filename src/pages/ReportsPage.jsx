@@ -32,7 +32,7 @@ export default function ReportsPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`whitespace-nowrap px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 -mb-px transition-colors ${
               activeTab === tab.id
-                ? 'border-[#1e2a30] text-[#1e2a30]'
+                ? 'border-brand text-brand'
                 : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300'
             }`}
           >

@@ -42,7 +42,7 @@ export default function TopBar() {
           <input
             type="text"
             placeholder="Search transactions..."
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 transition-colors focus:border-[#2cbcac] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 transition-colors focus:border-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/20"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.target.value.trim()) {
                 navigate(`/transactions?search=${encodeURIComponent(e.target.value.trim())}`);
@@ -57,7 +57,7 @@ export default function TopBar() {
           {/* Add button */}
           <button
             onClick={() => navigate('/transactions/new')}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#1e2a30] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2a3a42] active:bg-[#141e22]"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-hover active:bg-brand-deep"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -69,9 +69,9 @@ export default function TopBar() {
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-[#c5f1ec] transition-colors hover:border-[#2cbcac]"
+              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-accent-light transition-colors hover:border-accent"
             >
-              <span className="text-xs font-bold text-[#1e2a30]">
+              <span className="text-xs font-bold text-brand">
                 {user?.username?.charAt(0)?.toUpperCase() ?? '?'}
               </span>
             </button>

@@ -19,7 +19,7 @@ function CustomTooltip({ active, payload, label }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-md px-4 py-2 text-sm">
       <p className="font-medium text-gray-700 mb-1">{label}</p>
-      <p className="text-[#2cbcac] font-semibold">{formatINR(payload[0].value)}</p>
+      <p className="text-accent font-semibold">{formatINR(payload[0].value)}</p>
     </div>
   );
 }
@@ -148,7 +148,7 @@ export default function AccountHistory() {
                   <p className="text-xs text-gray-500">{entry.entry_type}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-sm font-semibold ${entry.entry_type === 'DEBIT' ? 'text-[#2cbcac]' : 'text-gray-800'}`}>
+                  <p className={`text-sm font-semibold ${entry.entry_type === 'DEBIT' ? 'text-accent' : 'text-gray-800'}`}>
                     {entry.entry_type === 'DEBIT' ? '-' : '+'}{formatINR(entry.amount)}
                   </p>
                   <p className="text-xs text-gray-400">Bal: {formatINR(entry.runningBalance)}</p>

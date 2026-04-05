@@ -49,7 +49,7 @@ function BeneficiaryToggle({ value, onChange }) {
           onClick={() => onChange(opt)}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all
             ${value === opt
-              ? 'bg-white text-[#1e2a30] shadow-sm'
+              ? 'bg-white text-brand shadow-sm'
               : 'text-gray-400 hover:text-gray-600'
             }`}
         >
@@ -75,7 +75,7 @@ function OwnerToggle({ value, onChange, options }) {
           onClick={() => onChange(opt)}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all
             ${value === opt
-              ? 'bg-white text-[#1e2a30] shadow-sm'
+              ? 'bg-white text-brand shadow-sm'
               : 'text-gray-400 hover:text-gray-600'
             }`}
         >
@@ -156,7 +156,7 @@ function MonthlySpendingChart({ data }) {
     return (
       <div className="rounded-xl bg-white ring-1 ring-gray-200 shadow-lg px-3 py-2 text-sm">
         <p className="font-semibold text-gray-700 mb-0.5">{label}</p>
-        <p className="text-[#2cbcac] font-bold">{formatINR(payload[0].value)}</p>
+        <p className="text-accent font-bold">{formatINR(payload[0].value)}</p>
       </div>
     );
   };
@@ -214,7 +214,7 @@ function CategoryPieChart({ data }) {
     return (
       <div className="rounded-xl bg-white ring-1 ring-gray-200 shadow-lg px-3 py-2 text-sm">
         <p className="font-semibold text-gray-700">{payload[0].name}</p>
-        <p className="text-[#2cbcac] font-bold">{formatINR(payload[0].value)}</p>
+        <p className="text-accent font-bold">{formatINR(payload[0].value)}</p>
       </div>
     );
   };
@@ -387,7 +387,7 @@ function ReceivablesSummary({ summary }) {
           {byPerson.map(({ person, amount }) => (
             <li key={person} className="flex items-center justify-between py-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#c5f1ec] flex items-center justify-center text-xs font-bold text-[#1e2a30] uppercase flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-accent-light flex items-center justify-center text-xs font-bold text-brand uppercase flex-shrink-0">
                   {person.charAt(0)}
                 </div>
                 <span className="text-sm font-medium text-gray-700">{person}</span>

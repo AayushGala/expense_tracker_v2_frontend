@@ -154,7 +154,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
             onClick={() => onPageChange(p)}
             className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-colors ${
               p === currentPage
-                ? 'bg-[#1e2a30] text-white shadow-sm'
+                ? 'bg-brand text-white shadow-sm'
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
             }`}
           >
@@ -257,7 +257,7 @@ export default function TransactionsPage() {
       {txnError && (
         <Card className="p-4 flex items-center gap-3 border-l-4 border-rose-400">
           <p className="text-sm text-gray-700 flex-1">Failed to load transactions. Please try again.</p>
-          <button onClick={refetch} className="text-sm font-semibold text-[#1e2a30] hover:underline shrink-0">Retry</button>
+          <button onClick={refetch} className="text-sm font-semibold text-brand hover:underline shrink-0">Retry</button>
         </Card>
       )}
 

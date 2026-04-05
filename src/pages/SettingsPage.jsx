@@ -33,13 +33,13 @@ export default function SettingsPage() {
             onClick={() => setActiveSection(s.id)}
             className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors ${
               activeSection === s.id
-                ? 'border-[#1e2a30] text-[#1e2a30]'
+                ? 'border-brand text-brand'
                 : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-3.5 w-3.5 flex-shrink-0 ${activeSection === s.id ? 'text-[#2cbcac]' : 'text-gray-400'}`}
+              className={`h-3.5 w-3.5 flex-shrink-0 ${activeSection === s.id ? 'text-accent' : 'text-gray-400'}`}
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -65,13 +65,13 @@ export default function SettingsPage() {
                     onClick={() => setActiveSection(s.id)}
                     className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-150 ${
                       activeSection === s.id
-                        ? 'bg-[#1e2a30] text-white'
+                        ? 'bg-brand text-white'
                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className={`h-4 w-4 flex-shrink-0 ${activeSection === s.id ? 'text-[#2cbcac]' : 'text-gray-400'}`}
+                      className={`h-4 w-4 flex-shrink-0 ${activeSection === s.id ? 'text-accent' : 'text-gray-400'}`}
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"

@@ -26,7 +26,7 @@ export default function TypeSelector({ value, onChange, disabled = false }) {
               flex-shrink-0 inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold
               border transition-all duration-150
               ${isSelected
-                ? 'bg-[#c5f1ec] text-[#1e2a30] border-[#2cbcac] shadow-sm'
+                ? 'bg-accent-light text-brand border-accent shadow-sm'
                 : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700 hover:bg-gray-50'
               }
             `}

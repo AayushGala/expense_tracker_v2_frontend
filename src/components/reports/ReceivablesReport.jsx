@@ -19,8 +19,8 @@ function agingDays(dateStr) {
 
 function statusBadge(status) {
   const map = {
-    pending:  'bg-[#1e2a30]/10 text-[#1e2a30]',
-    partial:  'bg-[#c5f1ec] text-[#1e2a30]',
+    pending:  'bg-brand/10 text-brand',
+    partial:  'bg-accent-light text-brand',
     settled:  'bg-gray-100 text-gray-600',
     paid:     'bg-gray-100 text-gray-600',
     waived:   'bg-gray-100 text-gray-600',
@@ -34,9 +34,9 @@ function statusBadge(status) {
 }
 
 function agingBadge(days) {
-  let cls = 'bg-[#c5f1ec] text-[#1e2a30]';
-  if (days > 90) cls = 'bg-[#1e2a30] text-white';
-  else if (days > 30) cls = 'bg-[#1e2a30]/10 text-[#1e2a30]';
+  let cls = 'bg-accent-light text-brand';
+  if (days > 90) cls = 'bg-brand text-white';
+  else if (days > 30) cls = 'bg-brand/10 text-brand';
   return (
     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>
       {days}d
@@ -89,7 +89,7 @@ export default function ReceivablesReport() {
               onClick={() => setStatusFilter(tab.value)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 statusFilter === tab.value
-                  ? 'bg-[#1e2a30] text-white'
+                  ? 'bg-brand text-white'
                   : 'text-gray-500 hover:bg-gray-100'
               }`}
             >
@@ -139,7 +139,7 @@ export default function ReceivablesReport() {
                     <td className="px-4 py-3 text-gray-700 whitespace-nowrap">
                       {formatINR(r._amount)}
                     </td>
-                    <td className="px-4 py-3 text-[#2cbcac] whitespace-nowrap">
+                    <td className="px-4 py-3 text-accent whitespace-nowrap">
                       {formatINR(r._settled)}
                     </td>
                     <td className="px-4 py-3 font-semibold text-gray-800 whitespace-nowrap">

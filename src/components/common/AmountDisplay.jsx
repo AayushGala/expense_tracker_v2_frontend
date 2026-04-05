@@ -3,11 +3,11 @@ import { formatINR } from '../../utils/formatters';
 export default function AmountDisplay({ amount, variant = 'neutral', showSign = false, className = '' }) {
   const colorClass =
     variant === 'income'
-      ? 'text-[#2cbcac]'
+      ? 'text-accent'
       : variant === 'expense'
       ? 'text-gray-800'
       : amount > 0
-      ? 'text-[#2cbcac]'
+      ? 'text-accent'
       : amount < 0
       ? 'text-gray-800'
       : 'text-gray-700';

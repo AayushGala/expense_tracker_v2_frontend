@@ -82,10 +82,10 @@ export default function CashflowReport() {
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Income',      value: totals.income,      color: 'text-[#2cbcac]' },
+          { label: 'Total Income',      value: totals.income,      color: 'text-accent' },
           { label: 'Total Expenses',    value: totals.expenses,    color: 'text-gray-800' },
           { label: 'Total Investments', value: totals.investments, color: 'text-gray-500' },
-          { label: 'Net Savings',       value: netSavings,         color: netSavings >= 0 ? 'text-[#2cbcac]' : 'text-gray-800' },
+          { label: 'Net Savings',       value: netSavings,         color: netSavings >= 0 ? 'text-accent' : 'text-gray-800' },
         ].map((s) => (
           <Card key={s.label} className="p-4">
             <p className="text-xs text-gray-500">{s.label}</p>

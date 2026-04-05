@@ -1,6 +1,6 @@
 export default function LoadingSpinner({
   size = 'h-8 w-8',
-  color = 'border-[#2cbcac]',
+  color = 'border-accent',
 }) {
   return (
     <div className="flex items-center justify-center w-full h-full py-12">

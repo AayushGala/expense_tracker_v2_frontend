@@ -159,7 +159,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
             placeholder="0.00"
             value={totalAmount}
             onChange={(e) => setTotalAmount(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-[#2cbcac] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2cbcac]/20 placeholder-gray-300"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 pl-10 pr-4 py-4 text-2xl font-bold text-gray-900 transition-colors focus:border-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/20 placeholder-gray-300"
           />
         </div>
         {errors.totalAmount && <p className={errorClass}>{errors.totalAmount}</p>}
@@ -239,7 +239,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
             onClick={() => setMyShareType('equal')}
             className={`flex-1 rounded-lg border py-3 min-h-[44px] text-sm font-medium transition-colors ${
               myShareType === 'equal'
-                ? 'bg-[#c5f1ec] border-[#2cbcac] text-[#1e2a30]'
+                ? 'bg-accent-light border-accent text-brand'
                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
             }`}
           >
@@ -250,7 +250,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
             onClick={() => setMyShareType('custom')}
             className={`flex-1 rounded-lg border py-3 min-h-[44px] text-sm font-medium transition-colors ${
               myShareType === 'custom'
-                ? 'bg-[#c5f1ec] border-[#2cbcac] text-[#1e2a30]'
+                ? 'bg-accent-light border-accent text-brand'
                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
             }`}
           >
@@ -321,7 +321,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
           <button
             type="button"
             onClick={addPerson}
-            className="min-h-[44px] px-3 text-xs font-medium text-[#2cbcac] hover:text-[#1e2a30] rounded-lg hover:bg-[#c5f1ec] transition-colors"
+            className="min-h-[44px] px-3 text-xs font-medium text-accent hover:text-brand rounded-lg hover:bg-accent-light transition-colors"
           >
             + Add Person
           </button>
@@ -384,9 +384,9 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-[#1e2a30] px-4 py-3 text-sm font-bold
-                   text-white shadow-sm hover:bg-[#2a3a42] focus:outline-none
-                   focus:ring-2 focus:ring-[#2cbcac]/30 transition-colors"
+        className="w-full rounded-xl bg-brand px-4 py-3 text-sm font-bold
+                   text-white shadow-sm hover:bg-brand-hover focus:outline-none
+                   focus:ring-2 focus:ring-accent/30 transition-colors"
       >
         {initialData ? 'Update Split Expense' : 'Save Split Expense'}
       </button>

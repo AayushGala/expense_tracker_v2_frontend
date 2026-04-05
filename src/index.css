@@ -13,6 +13,13 @@
   --color-primary-700: #0f766e;
   --color-primary-800: #115e59;
   --color-primary-900: #134e4a;
+  --color-brand: #1e2a30;
+  --color-brand-hover: #2a3a42;
+  --color-brand-deep: #141e22;
+  --color-accent: #2cbcac;
+  --color-accent-light: #c5f1ec;
+  --color-brand-muted: #7c9a9e;
+  --color-brand-slate: #4a6670;
 }
 
 * {

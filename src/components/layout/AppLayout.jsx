@@ -49,7 +49,7 @@ export default function AppLayout() {
       <button
         onClick={() => navigate('/transactions/new')}
         aria-label="Add transaction"
-        className="fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1e2a30] text-white shadow-lg shadow-[#1e2a30]/30 transition-all hover:bg-[#2a3a42] hover:shadow-xl hover:shadow-[#1e2a30]/40 active:scale-95 md:hidden"
+        className="fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/30 transition-all hover:bg-brand-hover hover:shadow-xl hover:shadow-brand/40 active:scale-95 md:hidden"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

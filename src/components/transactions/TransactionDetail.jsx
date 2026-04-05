@@ -95,8 +95,8 @@ export default function TransactionDetail({
       </div>
 
       {/* Amount */}
-      <div className="rounded-2xl bg-[#1e2a30] px-5 py-4 flex items-center justify-between">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-[#7a9a9e]">Amount</span>
+      <div className="rounded-2xl bg-brand px-5 py-4 flex items-center justify-between">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-brand-muted">Amount</span>
         <p className="text-2xl font-bold text-white tabular-nums">
           {formatINR(amount ?? 0)}
         </p>
@@ -135,7 +135,7 @@ export default function TransactionDetail({
                     <td className="px-4 py-2.5 text-gray-700 font-medium truncate max-w-[140px]">
                       {resolveEntryName(entry)}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-[#2cbcac] font-medium">
+                    <td className="px-4 py-2.5 text-right tabular-nums text-accent font-medium">
                       {entry.entry_type === 'DEBIT' ? formatINR(entry.amount) : '—'}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-gray-800 font-medium">
@@ -153,8 +153,8 @@ export default function TransactionDetail({
       <div className="flex gap-3 pt-1">
         <button
           onClick={handleEdit}
-          className="flex-1 rounded-xl bg-[#1e2a30] py-2.5 text-sm
-                     font-semibold text-white hover:bg-[#2a3a42] transition-colors"
+          className="flex-1 rounded-xl bg-brand py-2.5 text-sm
+                     font-semibold text-white hover:bg-brand-hover transition-colors"
         >
           Edit
         </button>
