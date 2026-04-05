@@ -232,11 +232,12 @@ export function useReports() {
       (r) => r.status !== 'settled' && r.status !== 'paid'
     );
 
-    const personMap = new Map(); // person name → amount owed
+    const personMap = new Map(); // person name → outstanding amount
     for (const r of outstanding) {
       const name = r.person_name ?? 'Unknown';
       const prev = personMap.get(name) ?? 0;
-      personMap.set(name, Math.round((prev + (r.amount_owed ?? 0)) * 100) / 100);
+      const remaining = (r.amount_owed ?? 0) - (r.amount_settled ?? 0);
+      personMap.set(name, Math.round((prev + remaining) * 100) / 100);
     }
 
     const byPerson = Array.from(personMap.entries()).map(([person, amount]) => ({

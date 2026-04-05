@@ -39,7 +39,7 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
   const [errors, setErrors] = useState({});
 
   const selectedReceivable = pendingReceivables.find(
-    (r) => r.id === selectedReceivableId
+    (r) => String(r.id) === String(selectedReceivableId)
   ) ?? null;
 
   const outstanding = selectedReceivable

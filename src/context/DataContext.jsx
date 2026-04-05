@@ -295,8 +295,14 @@ export function DataProvider({ children }) {
       payload: { transaction, entries, receivables },
     });
 
+    // Reimbursements update existing receivables on the backend,
+    // so reload all data to get the updated amount_settled/status.
+    if (transactionData.type === 'reimbursement') {
+      await loadData();
+    }
+
     return result;
-  }, []);
+  }, [loadData]);
 
   const updateTransaction = useCallback(async (id, transactionData) => {
     const result = await api.updateTransaction(id, transactionData);
