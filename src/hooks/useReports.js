@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 
 // ---------------------------------------------------------------------------
@@ -91,7 +91,7 @@ export function useReports() {
    * @param {string} [owner]
    * @returns {Array<{ month: string, total: number }>}
    */
-  function monthlySpending(beneficiary, months = 12, owner) {
+  const monthlySpending = useCallback((beneficiary, months = 12, owner) => {
     const keys = generateMonthKeys(months);
     const totals = Object.fromEntries(keys.map((k) => [k, 0]));
 
@@ -108,7 +108,7 @@ export function useReports() {
     }
 
     return keys.map((month) => ({ month, total: totals[month] }));
-  }
+  }, [expenseEntries, txnMap]);
 
   // ── categoryBreakdown ─────────────────────────────────────────────────────
 
@@ -121,7 +121,7 @@ export function useReports() {
    * @param {string} [owner]
    * @returns {Array<{ categoryId: string, categoryName: string, total: number }>}
    */
-  function categoryBreakdown(beneficiary, month, owner) {
+  const categoryBreakdown = useCallback((beneficiary, month, owner) => {
     const targetMonth = month ?? toMonthKey(new Date());
     const totals = new Map(); // categoryId → number
 
@@ -144,7 +144,7 @@ export function useReports() {
       categoryName: categoryMap.get(categoryId)?.name ?? categoryId,
       total,
     }));
-  }
+  }, [expenseEntries, txnMap, categoryMap]);
 
   // ── cashflow ──────────────────────────────────────────────────────────────
 
@@ -156,7 +156,7 @@ export function useReports() {
    * @param {string} [owner]
    * @returns {Array<{ month: string, income: number, expenses: number, investments: number }>}
    */
-  function cashflow(months = 12, owner) {
+  const cashflow = useCallback((months = 12, owner) => {
     const keys = generateMonthKeys(months);
     const data = Object.fromEntries(
       keys.map((k) => [k, { income: 0, expenses: 0, investments: 0 }])
@@ -190,7 +190,7 @@ export function useReports() {
     }
 
     return keys.map((month) => ({ month, ...data[month] }));
-  }
+  }, [expenseEntries, incomeEntries, investmentTxns, txnMap]);
 
   // ── spendingTrends ────────────────────────────────────────────────────────
 
@@ -203,7 +203,7 @@ export function useReports() {
    * @param {string} [owner]
    * @returns {Array<{ month: string, total: number }>}
    */
-  function spendingTrends(categoryId, months = 12, owner) {
+  const spendingTrends = useCallback((categoryId, months = 12, owner) => {
     const keys = generateMonthKeys(months);
     const totals = Object.fromEntries(keys.map((k) => [k, 0]));
 
@@ -218,7 +218,7 @@ export function useReports() {
     }
 
     return keys.map((month) => ({ month, total: totals[month] }));
-  }
+  }, [expenseEntries, txnMap]);
 
   // ── receivablesSummary ────────────────────────────────────────────────────
 
@@ -227,7 +227,7 @@ export function useReports() {
    *
    * @returns {{ totalOwed: number, byPerson: Array<{ person: string, amount: number }> }}
    */
-  function receivablesSummary() {
+  const receivablesSummary = useCallback(() => {
     const outstanding = receivables.filter(
       (r) => r.status !== 'settled' && r.status !== 'paid'
     );
@@ -251,7 +251,7 @@ export function useReports() {
       totalOwed: Math.round(totalOwed * 100) / 100,
       byPerson,
     };
-  }
+  }, [receivables]);
 
   return {
     monthlySpending,

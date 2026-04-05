@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { computeAllBalances, computeNetWorth } from '../utils/accounting';
 
@@ -44,9 +44,10 @@ export function useAccounts() {
    * @param {string} accountId
    * @returns {number}
    */
-  function getAccountBalance(accountId) {
-    return balances.get(accountId) ?? 0;
-  }
+  const getAccountBalance = useCallback(
+    (accountId) => balances.get(accountId) ?? 0,
+    [balances]
+  );
 
   /**
    * Returns all ledger entries for an account sorted by transaction date (ascending),
@@ -55,7 +56,7 @@ export function useAccounts() {
    * @param {string} accountId
    * @returns {Array<Object>}
    */
-  function getAccountLedger(accountId) {
+  const getAccountLedger = useCallback((accountId) => {
     // Build a quick lookup from transaction id → date
     const txnDateMap = new Map(transactions.map((t) => [t.id, t.date]));
 
@@ -86,7 +87,7 @@ export function useAccounts() {
       runningBalance = Math.round((runningBalance + delta) * 100) / 100;
       return { ...entry, runningBalance };
     });
-  }
+  }, [transactions, entries, activeAccounts]);
 
   return {
     accounts: activeAccounts,

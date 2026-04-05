@@ -421,20 +421,17 @@ export default function DashboardPage() {
 
   const spendingData = useMemo(
     () => monthlySpending(beneficiaryFilter, 6, ownerValue),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [beneficiaryFilter, ownerValue]
+    [beneficiaryFilter, ownerValue, monthlySpending]
   );
 
   const categoryData = useMemo(
     () => categoryBreakdown(beneficiaryFilter, undefined, ownerValue),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [beneficiaryFilter, ownerValue]
+    [beneficiaryFilter, ownerValue, categoryBreakdown]
   );
 
   const receivables = useMemo(
     () => receivablesSummary(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [receivablesSummary]
   );
 
   // Filter net worth by owner
