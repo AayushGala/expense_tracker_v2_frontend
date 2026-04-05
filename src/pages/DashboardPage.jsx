@@ -21,7 +21,7 @@ import Badge from '../components/common/Badge';
 import AmountDisplay from '../components/common/AmountDisplay';
 import EmptyState from '../components/common/EmptyState';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { formatDate, formatINR } from '../utils/formatters';
+import { formatDate, formatINR, transactionTypeLabel } from '../utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -252,16 +252,48 @@ function CategoryPieChart({ data }) {
 }
 
 // ---------------------------------------------------------------------------
+// TypeIcon — matches the Transactions tab style
+// ---------------------------------------------------------------------------
+
+const TYPE_ICONS = {
+  expense: { bg: 'bg-[#1e2a30]', color: 'text-white', path: 'M12 5v14m0 0l6-6m-6 6l-6-6' },
+  income: { bg: 'bg-[#c5f1ec]', color: 'text-[#2cbcac]', path: 'M12 19V5m0 0l-6 6m6-6l6 6' },
+  transfer: { bg: 'bg-gray-100', color: 'text-gray-500', path: 'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4' },
+  bill_payment: { bg: 'bg-[#1e2a30]/10', color: 'text-[#1e2a30]', path: 'M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z' },
+  investment: { bg: 'bg-gray-100', color: 'text-gray-500', path: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+  cashback: { bg: 'bg-[#c5f1ec]', color: 'text-[#2cbcac]', path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  split_expense: { bg: 'bg-[#1e2a30]/10', color: 'text-[#1e2a30]', path: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+  reimbursement: { bg: 'bg-[#c5f1ec]', color: 'text-[#2cbcac]', path: 'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6' },
+};
+
+function TypeIcon({ type }) {
+  const icon = TYPE_ICONS[type] ?? { bg: 'bg-gray-100', color: 'text-gray-500', path: 'M12 6v6m0 0v6m0-6h6m-6 0H6' };
+  return (
+    <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${icon.bg} flex-shrink-0`}>
+      <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${icon.color}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d={icon.path} />
+      </svg>
+    </div>
+  );
+}
+
+function getVariant(type) {
+  if (type === 'income' || type === 'cashback' || type === 'reimbursement') return 'income';
+  if (type === 'expense' || type === 'bill_payment' || type === 'split_expense') return 'expense';
+  return 'neutral';
+}
+
+// ---------------------------------------------------------------------------
 // RecentTransactions
 // ---------------------------------------------------------------------------
 
 function RecentTransactions({ transactions }) {
   if (transactions.length === 0) {
     return (
-      <Card className="p-6 flex flex-col gap-3">
-        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-          Recent Transactions
-        </h3>
+      <Card className="p-0 overflow-hidden">
+        <div className="flex items-center justify-between px-4 md:px-5 py-4 border-b border-gray-100">
+          <h2 className="text-sm font-bold text-gray-900">Recent Activity</h2>
+        </div>
         <EmptyState
           message="No transactions yet"
           description="Add your first transaction to get started."
@@ -272,39 +304,91 @@ function RecentTransactions({ transactions }) {
   }
 
   return (
-    <Card className="p-6 flex flex-col gap-3">
-      <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-        Recent Transactions
-      </h3>
-      <ul className="divide-y divide-gray-100 -mx-6 px-6">
+    <Card className="p-0 overflow-hidden">
+      <div className="flex items-center justify-between px-4 md:px-5 py-4 border-b border-gray-100">
+        <h2 className="text-sm font-bold text-gray-900">Recent Activity</h2>
+        <p className="text-xs text-gray-400">{transactions.length} of {transactions.length}</p>
+      </div>
+
+      {/* Mobile card list */}
+      <div className="md:hidden divide-y divide-gray-50">
         {transactions.map((txn) => (
-          <li key={txn.id} className="flex items-center gap-3 py-3.5">
-            <Badge type={txn.type} className="flex-shrink-0" />
+          <div key={txn.id} className="w-full flex items-center gap-3 px-4 py-3.5 text-left">
+            <TypeIcon type={txn.type} />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 truncate">
-                {txn.notes || txn.type}
+                {txn.notes || transactionTypeLabel(txn.type)}
               </p>
-              <p className="text-xs text-gray-400 truncate">
+              <p className="text-xs text-gray-400 mt-0.5">
                 {formatDate(txn.date)}
-                {txn.accountNames?.length > 0 && (
-                  <> &middot; {txn.accountNames.join(', ')}</>
-                )}
+                {txn.categoryNames?.length > 0 && ` · ${txn.categoryNames[0]}`}
+                {txn.platform && ` · ${txn.platform}`}
               </p>
             </div>
             <AmountDisplay
               amount={txn.amount ?? 0}
-              variant={
-                txn.type === 'income' || txn.type === 'cashback' || txn.type === 'reimbursement'
-                  ? 'income'
-                  : txn.type === 'expense' || txn.type === 'bill_payment' || txn.type === 'split_expense'
-                  ? 'expense'
-                  : 'neutral'
-              }
-              className="text-sm flex-shrink-0"
+              variant={getVariant(txn.type)}
+              className="text-sm font-bold flex-shrink-0"
             />
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="py-3 pl-5 pr-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400">Date</th>
+              <th className="py-3 px-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400">Description</th>
+              <th className="py-3 px-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400 hidden lg:table-cell">Category</th>
+              <th className="py-3 px-3 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400">Amount</th>
+              <th className="py-3 pl-3 pr-5 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400 hidden sm:table-cell">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {transactions.map((txn) => (
+              <tr key={txn.id} className="hover:bg-gray-50/80 transition-colors">
+                <td className="py-4 pl-5 pr-3 whitespace-nowrap">
+                  <p className="text-sm font-medium text-gray-700">{formatDate(txn.date)}</p>
+                </td>
+                <td className="py-4 px-3">
+                  <div className="flex items-center gap-3">
+                    <TypeIcon type={txn.type} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {txn.notes || transactionTypeLabel(txn.type)}
+                      </p>
+                      {(txn.accountNames?.length > 0 || txn.platform) && (
+                        <p className="text-xs text-gray-400 truncate mt-0.5">
+                          {[txn.accountNames?.join(' · '), txn.platform].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </td>
+                <td className="py-4 px-3 hidden lg:table-cell">
+                  {txn.categoryNames?.length > 0 && (
+                    <span className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600 uppercase tracking-wide">
+                      {txn.categoryNames[0]}
+                    </span>
+                  )}
+                </td>
+                <td className="py-4 px-3 text-right whitespace-nowrap">
+                  <AmountDisplay
+                    amount={txn.amount ?? 0}
+                    variant={getVariant(txn.type)}
+                    className="text-sm"
+                  />
+                </td>
+                <td className="py-4 pl-3 pr-5 hidden sm:table-cell">
+                  <Badge type={txn.type} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Card>
   );
 }

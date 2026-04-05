@@ -99,12 +99,41 @@ export default function InvestmentForm({ onSubmit, initialData }) {
         {errors.amount && <p className={errorClass}>{errors.amount}</p>}
       </div>
 
-      {/* Date + Owner */}
+      {/* Date + From Account */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Date</label>
           <CalendarPicker value={date} onChange={(val) => setDate(val)} className="w-full" />
           {errors.date && <p className={errorClass}>{errors.date}</p>}
+        </div>
+
+        <div>
+          <label className={labelClass}>From (Liquid Account)</label>
+          <Select
+            value={fromAccountId}
+            onChange={(e) => handleFromAccountChange(e.target.value)}
+            options={liquidAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            placeholder="Select source account"
+          />
+          {errors.fromAccountId && (
+            <p className={errorClass}>{errors.fromAccountId}</p>
+          )}
+        </div>
+      </div>
+
+      {/* To Account + Owner */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Into (Investment / Brokerage Account)</label>
+          <Select
+            value={toAccountId}
+            onChange={(e) => setToAccountId(e.target.value)}
+            options={investmentAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            placeholder="Select investment account"
+          />
+          {errors.toAccountId && (
+            <p className={errorClass}>{errors.toAccountId}</p>
+          )}
         </div>
 
         {owners.length > 0 && (
@@ -118,35 +147,6 @@ export default function InvestmentForm({ onSubmit, initialData }) {
             />
           </div>
         )}
-      </div>
-
-      {/* From Account + To Account */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>From (Liquid Account)</label>
-          <Select
-            value={fromAccountId}
-            onChange={(e) => handleFromAccountChange(e.target.value)}
-            options={liquidAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
-            placeholder="Select source account"
-          />
-          {errors.fromAccountId && (
-            <p className={errorClass}>{errors.fromAccountId}</p>
-          )}
-        </div>
-
-        <div>
-          <label className={labelClass}>Into (Investment / Brokerage Account)</label>
-          <Select
-            value={toAccountId}
-            onChange={(e) => setToAccountId(e.target.value)}
-            options={investmentAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
-            placeholder="Select investment account"
-          />
-          {errors.toAccountId && (
-            <p className={errorClass}>{errors.toAccountId}</p>
-          )}
-        </div>
       </div>
 
       {/* Platform */}

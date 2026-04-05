@@ -248,7 +248,7 @@ describe('DataContext', () => {
   // Transaction CRUD
   // -----------------------------------------------------------------------
 
-  it('adds a transaction with entries', async () => {
+  it('adds a transaction and reloads data', async () => {
     mockApi.createTransaction.mockResolvedValue({
       id: 10,
       category: 1,
@@ -263,34 +263,20 @@ describe('DataContext', () => {
       await result.current.addTransaction({ amount: 100 });
     });
 
-    expect(result.current.transactions).toHaveLength(1);
-    expect(result.current.entries).toHaveLength(1);
-    // Transform should map transaction field to transaction_id
-    expect(result.current.entries[0].transaction_id).toBe(10);
-    // Transform should parse string amounts
-    expect(result.current.entries[0].amount).toBe(100);
+    expect(mockApi.createTransaction).toHaveBeenCalledWith({ amount: 100 });
+    // Should reload all data after adding
+    expect(mockApi.getAllData).toHaveBeenCalledTimes(2); // initial + reload
   });
 
-  it('deletes a transaction and its entries', async () => {
-    mockApi.createTransaction.mockResolvedValue({
-      id: 10,
-      category: 1,
-      entries: [{ id: 1, transaction: 10, account: 1, amount: 100 }],
-    });
-
+  it('deletes a transaction', async () => {
     const { result } = renderHook(() => useData(), { wrapper });
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     await act(async () => {
-      await result.current.addTransaction({});
-    });
-    expect(result.current.transactions).toHaveLength(1);
-
-    await act(async () => {
       await result.current.deleteTransaction(10);
     });
-    expect(result.current.transactions).toHaveLength(0);
-    expect(result.current.entries).toHaveLength(0);
+
+    expect(mockApi.deleteTransaction).toHaveBeenCalledWith(10);
   });
 
   // -----------------------------------------------------------------------

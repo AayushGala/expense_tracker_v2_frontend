@@ -296,11 +296,9 @@ export function DataProvider({ children }) {
       payload: { transaction, entries, receivables },
     });
 
-    // Reimbursements update existing receivables on the backend,
-    // so reload all data to get the updated amount_settled/status.
-    if (transactionData.type === 'reimbursement') {
-      await loadData();
-    }
+    // Reload all data to ensure consistency — entries, receivables,
+    // and account balances are all updated from the backend.
+    await loadData();
 
     return result;
   }, [loadData]);
@@ -316,8 +314,10 @@ export function DataProvider({ children }) {
       payload: { id, transaction, newEntries },
     });
 
+    await loadData();
+
     return result;
-  }, []);
+  }, [loadData]);
 
   const deleteTransaction = useCallback(async (id) => {
     await api.deleteTransaction(id);

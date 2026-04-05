@@ -10,7 +10,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import Modal from '../components/common/Modal';
 import Card from '../components/common/Card';
 import TransactionDetail from '../components/transactions/TransactionDetail';
-import { formatDate, formatRelativeDate } from '../utils/formatters';
+import { formatDate, formatRelativeDate, transactionTypeLabel } from '../utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -83,7 +83,7 @@ function TransactionRow({ txn, onClick }) {
           <TypeIcon type={txn.type} />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-gray-900 truncate">
-              {txn.notes || txn.type}
+              {txn.notes || transactionTypeLabel(txn.type)}
             </p>
             {(txn.accountNames?.length > 0 || txn.platform) && (
               <p className="text-xs text-gray-400 truncate mt-0.5">
@@ -133,7 +133,7 @@ function TransactionCard({ txn, onClick }) {
       <TypeIcon type={txn.type} />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-gray-900 truncate">
-          {txn.notes || txn.type}
+          {txn.notes || transactionTypeLabel(txn.type)}
         </p>
         <p className="text-xs text-gray-400 mt-0.5">
           {formatDate(txn.date)}

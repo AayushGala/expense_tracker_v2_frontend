@@ -1,5 +1,6 @@
 import Badge from '../common/Badge';
 import AmountDisplay from '../common/AmountDisplay';
+import { transactionTypeLabel } from '../../utils/formatters';
 
 /**
  * Determines the amount colour variant based on transaction type.
@@ -49,7 +50,7 @@ export default function TransactionListItem({ transaction, fromAccountName, onSe
       {/* Description + account */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900 truncate leading-snug">
-          {notes || type}
+          {notes || transactionTypeLabel(type)}
         </p>
         <p className="text-xs text-gray-400 mt-0.5 truncate">
           {/* Badge inline for xs screens */}

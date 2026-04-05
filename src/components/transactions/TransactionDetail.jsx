@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
-import { formatDate, formatINR } from '../../utils/formatters';
+import { formatDate, formatINR, transactionTypeLabel } from '../../utils/formatters';
 import Badge from '../common/Badge';
 import AmountDisplay from '../common/AmountDisplay';
 
@@ -90,7 +90,7 @@ export default function TransactionDetail({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-lg font-bold text-gray-900 leading-tight">
-            {notes || type}
+            {notes || transactionTypeLabel(type)}
           </p>
           {date && (
             <p className="text-sm text-gray-400 mt-0.5">{formatDate(date)}</p>
@@ -100,13 +100,11 @@ export default function TransactionDetail({
       </div>
 
       {/* Amount */}
-      <div className="rounded-xl bg-gray-50 px-5 py-4 flex items-center justify-between ring-1 ring-gray-100">
-        <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Amount</span>
-        <AmountDisplay
-          amount={amount ?? 0}
-          variant={amountVariant(type)}
-          className="text-2xl font-bold"
-        />
+      <div className="rounded-2xl bg-[#1e2a30] px-5 py-4 flex items-center justify-between">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-[#7a9a9e]">Amount</span>
+        <p className="text-2xl font-bold text-white tabular-nums">
+          {formatINR(amount ?? 0)}
+        </p>
       </div>
 
       {/* Details grid */}
@@ -142,10 +140,10 @@ export default function TransactionDetail({
                     <td className="px-4 py-2.5 text-gray-700 font-medium truncate max-w-[140px]">
                       {resolveEntryName(entry)}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-emerald-600 font-medium">
+                    <td className="px-4 py-2.5 text-right tabular-nums text-[#2cbcac] font-medium">
                       {entry.entry_type === 'DEBIT' ? formatINR(entry.amount) : '—'}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-rose-500 font-medium">
+                    <td className="px-4 py-2.5 text-right tabular-nums text-gray-800 font-medium">
                       {entry.entry_type === 'CREDIT' ? formatINR(entry.amount) : '—'}
                     </td>
                   </tr>
@@ -160,27 +158,19 @@ export default function TransactionDetail({
       <div className="flex gap-3 pt-1">
         <button
           onClick={handleEdit}
-          className="flex-1 rounded-xl border border-[#2cbcac] bg-[#c5f1ec] py-2.5 text-sm
-                     font-semibold text-[#1e2a30] hover:bg-[#c5f1ec] transition-colors"
+          className="flex-1 rounded-xl bg-[#1e2a30] py-2.5 text-sm
+                     font-semibold text-white hover:bg-[#2a3a42] transition-colors"
         >
           Edit
         </button>
         <button
           onClick={handleDelete}
-          className="flex-1 rounded-xl border border-rose-200 bg-rose-50 py-2.5 text-sm
-                     font-semibold text-rose-600 hover:bg-rose-100 transition-colors"
+          className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm
+                     font-semibold text-gray-500 hover:bg-gray-50 transition-colors"
         >
           Delete
         </button>
       </div>
-
-      <button
-        onClick={onClose}
-        className="w-full rounded-xl border border-gray-200 py-2.5 text-sm font-semibold
-                   text-gray-500 hover:bg-gray-50 transition-colors"
-      >
-        Close
-      </button>
     </div>
   );
 }
