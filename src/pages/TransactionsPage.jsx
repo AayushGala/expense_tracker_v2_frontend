@@ -38,7 +38,9 @@ function groupByDate(transactions) {
 function TransactionRow({ txn, onClick }) {
   return (
     <tr
+      tabIndex={0}
       onClick={() => onClick(txn)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(txn); } }}
       className="hover:bg-gray-50/80 cursor-pointer transition-colors group"
     >
       {/* Date */}

@@ -90,10 +90,11 @@ export default function CashbackForm({ onSubmit, initialData }) {
 
       {/* Amount */}
       <div>
-        <label className={labelClass}>Cashback Amount</label>
+        <label htmlFor="txn-amount" className={labelClass}>Cashback Amount</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">₹</span>
           <input
+            id="txn-amount"
             type="number"
             inputMode="decimal"
             min="0"
@@ -142,8 +143,9 @@ export default function CashbackForm({ onSubmit, initialData }) {
 
       {/* Platform */}
       <div>
-        <label className={labelClass}>Platform</label>
+        <label htmlFor="txn-platform" className={labelClass}>Platform</label>
         <input
+          id="txn-platform"
           type="text"
           placeholder="e.g. Swiggy, Amazon, Flipkart"
           value={platform}
@@ -154,8 +156,9 @@ export default function CashbackForm({ onSubmit, initialData }) {
 
       {/* Notes */}
       <div>
-        <label className={labelClass}>Notes</label>
+        <label htmlFor="txn-notes" className={labelClass}>Notes</label>
         <textarea
+          id="txn-notes"
           rows={3}
           placeholder="Optional notes"
           value={notes}

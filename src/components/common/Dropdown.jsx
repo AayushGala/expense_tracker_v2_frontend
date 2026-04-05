@@ -12,6 +12,8 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
+  const optionRefs = useRef([]);
+  const focusedIndexRef = useRef(-1);
   const [menuStyle, setMenuStyle] = useState({});
 
   const selectedOption = options.find((o) => o.value === value);
@@ -28,6 +30,19 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     }
     return () => openDropdowns.delete(closeFn);
   }, [open, closeFn]);
+
+  // Focus the selected option when menu opens
+  useEffect(() => {
+    if (open) {
+      const selectedIdx = options.findIndex((o) => o.value === value);
+      const idxToFocus = selectedIdx >= 0 ? selectedIdx : 0;
+      focusedIndexRef.current = idxToFocus;
+      // Delay to allow portal to render
+      requestAnimationFrame(() => {
+        optionRefs.current[idxToFocus]?.focus();
+      });
+    }
+  }, [open, options, value]);
 
   // Position the menu beneath (or above) the trigger
   const updatePosition = useCallback(() => {
@@ -105,9 +120,60 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     }
   }
 
+  function handleTriggerKeyDown(e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!open) {
+        closeAll();
+        setOpen(true);
+      }
+    }
+  }
+
+  function handleOptionKeyDown(e, idx, optValue) {
+    switch (e.key) {
+      case 'ArrowDown': {
+        e.preventDefault();
+        const next = idx < options.length - 1 ? idx + 1 : idx;
+        focusedIndexRef.current = next;
+        optionRefs.current[next]?.focus();
+        break;
+      }
+      case 'ArrowUp': {
+        e.preventDefault();
+        const prev = idx > 0 ? idx - 1 : idx;
+        focusedIndexRef.current = prev;
+        optionRefs.current[prev]?.focus();
+        break;
+      }
+      case 'Enter':
+      case ' ': {
+        e.preventDefault();
+        handleSelect(optValue);
+        break;
+      }
+      case 'Home': {
+        e.preventDefault();
+        focusedIndexRef.current = 0;
+        optionRefs.current[0]?.focus();
+        break;
+      }
+      case 'End': {
+        e.preventDefault();
+        const last = options.length - 1;
+        focusedIndexRef.current = last;
+        optionRefs.current[last]?.focus();
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
   function handleSelect(optValue) {
     onChange(optValue);
     setOpen(false);
+    triggerRef.current?.focus();
   }
 
   return (
@@ -116,7 +182,10 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
       <button
         ref={triggerRef}
         type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onMouseDown={handleToggle}
+        onKeyDown={handleTriggerKeyDown}
         className={`
           w-full flex items-center gap-2 rounded-xl border bg-white
           px-3 py-2.5 text-sm transition-colors cursor-pointer
@@ -143,19 +212,24 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
       {open && createPortal(
         <div
           ref={menuRef}
+          role="listbox"
           style={menuStyle}
           className="z-[9999] rounded-xl border border-gray-200 bg-white shadow-xl py-1 max-h-60 overflow-y-auto"
         >
-          {options.map((opt) => {
+          {options.map((opt, idx) => {
             const isSelected = opt.value === value;
             return (
               <button
                 key={opt.value}
+                ref={(el) => (optionRefs.current[idx] = el)}
                 type="button"
+                role="option"
+                aria-selected={isSelected}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSelect(opt.value);
                 }}
+                onKeyDown={(e) => handleOptionKeyDown(e, idx, opt.value)}
                 className={`
                   w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2
                   ${isSelected

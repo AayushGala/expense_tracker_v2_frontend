@@ -93,10 +93,11 @@ export default function ExpenseForm({ onSubmit, initialData }) {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Amount — hero field */}
       <div>
-        <label className={labelClass}>Amount</label>
+        <label htmlFor="txn-amount" className={labelClass}>Amount</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">₹</span>
           <input
+            id="txn-amount"
             type="number"
             inputMode="decimal"
             min="0"
@@ -159,6 +160,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
           {beneficiaryType === 'custom' && (
             <div className="mt-2">
               <input
+                id="txn-custom-beneficiary"
                 type="text"
                 placeholder="Enter name"
                 value={customBeneficiary}
@@ -189,19 +191,20 @@ export default function ExpenseForm({ onSubmit, initialData }) {
       {/* Platform + Tags */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Platform</label>
-          <input type="text" placeholder="e.g. Swiggy, Amazon" value={platform} onChange={(e) => setPlatform(e.target.value)} className={inputClass} />
+          <label htmlFor="txn-platform" className={labelClass}>Platform</label>
+          <input id="txn-platform" type="text" placeholder="e.g. Swiggy, Amazon" value={platform} onChange={(e) => setPlatform(e.target.value)} className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Tags (comma-separated)</label>
-          <input type="text" placeholder="food, travel, utilities" value={tags} onChange={(e) => setTags(e.target.value)} className={inputClass} />
+          <label htmlFor="txn-tags" className={labelClass}>Tags (comma-separated)</label>
+          <input id="txn-tags" type="text" placeholder="food, travel, utilities" value={tags} onChange={(e) => setTags(e.target.value)} className={inputClass} />
         </div>
       </div>
 
       {/* Notes */}
       <div>
-        <label className={labelClass}>Notes (optional)</label>
+        <label htmlFor="txn-notes" className={labelClass}>Notes (optional)</label>
         <textarea
+          id="txn-notes"
           rows={3}
           placeholder="Add a short description of this transaction..."
           value={notes}

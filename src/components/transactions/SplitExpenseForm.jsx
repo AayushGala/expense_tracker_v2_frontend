@@ -148,10 +148,11 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Total Amount */}
       <div>
-        <label className={labelClass}>Total Bill Amount</label>
+        <label htmlFor="txn-amount" className={labelClass}>Total Bill Amount</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">₹</span>
           <input
+            id="txn-amount"
             type="number"
             inputMode="decimal"
             min="0"
@@ -218,8 +219,9 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
 
       {/* Total People */}
       <div>
-        <label className={labelClass}>Total Number of People</label>
+        <label htmlFor="txn-total-people" className={labelClass}>Total Number of People</label>
         <input
+          id="txn-total-people"
           type="number"
           inputMode="numeric"
           min="2"
@@ -267,6 +269,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
         {myShareType === 'custom' && (
           <div>
             <input
+              id="txn-my-share"
               type="number"
               inputMode="decimal"
               min="0"
@@ -292,8 +295,9 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
 
       {/* Platform */}
       <div>
-        <label className={labelClass}>Platform</label>
+        <label htmlFor="txn-platform" className={labelClass}>Platform</label>
         <input
+          id="txn-platform"
           type="text"
           placeholder="e.g. Swiggy, Amazon, Flipkart"
           value={platform}
@@ -304,8 +308,9 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
 
       {/* Notes */}
       <div>
-        <label className={labelClass}>Notes</label>
+        <label htmlFor="txn-notes" className={labelClass}>Notes</label>
         <textarea
+          id="txn-notes"
           rows={2}
           placeholder="Optional notes"
           value={notes}
