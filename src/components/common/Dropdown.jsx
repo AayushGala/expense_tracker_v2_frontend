@@ -31,18 +31,13 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     return () => openDropdowns.delete(closeFn);
   }, [open, closeFn]);
 
-  // Focus the selected option when menu opens
+  // Track focused index when menu opens (don't auto-focus to avoid layout shift)
   useEffect(() => {
     if (open) {
       const selectedIdx = options.findIndex((o) => o.value === value);
-      const idxToFocus = selectedIdx >= 0 ? selectedIdx : 0;
-      focusedIndexRef.current = idxToFocus;
-      // Delay to allow portal to render
-      requestAnimationFrame(() => {
-        optionRefs.current[idxToFocus]?.focus();
-      });
+      focusedIndexRef.current = selectedIdx >= 0 ? selectedIdx : 0;
     }
-  }, [open, options, value]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Position the menu beneath (or above) the trigger
   const updatePosition = useCallback(() => {
@@ -114,8 +109,9 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     if (open) {
       setOpen(false);
     } else {
-      // Close all other open dropdowns first, then open this one
       closeAll();
+      // Pre-compute position before opening to prevent flash at 0,0
+      updatePosition();
       setOpen(true);
     }
   }
@@ -125,6 +121,7 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
       e.preventDefault();
       if (!open) {
         closeAll();
+        updatePosition();
         setOpen(true);
       }
     }

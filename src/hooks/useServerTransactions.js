@@ -14,7 +14,8 @@ export function useServerTransactions(filters = {}, page = 1) {
 
   const [results, setResults] = useState([]);
   const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [error, setError] = useState(null);
 
   // Lookup maps for enrichment
@@ -79,6 +80,7 @@ export function useServerTransactions(filters = {}, page = 1) {
       setCount(0);
     } finally {
       setLoading(false);
+      setInitialLoad(false);
     }
   }, [paramsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -138,7 +140,8 @@ export function useServerTransactions(filters = {}, page = 1) {
   return {
     transactions: enrichedTransactions,
     totalCount: count,
-    isLoading: loading,
+    isLoading: initialLoad,
+    isFetching: loading,
     error,
     refetch: fetchTransactions,
     getTransactionEntries,

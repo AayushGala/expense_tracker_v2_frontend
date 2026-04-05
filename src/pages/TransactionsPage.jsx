@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useServerTransactions } from '../hooks/useServerTransactions';
+import { useTransactions } from '../hooks/useTransactions';
 import { useData } from '../context/DataContext';
 import FilterBar from '../components/common/FilterBar';
 import Badge from '../components/common/Badge';
@@ -201,16 +201,13 @@ export default function TransactionsPage() {
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const {
-    transactions: paginatedTxns,
-    totalCount,
-    isLoading: txnLoading,
-    error: txnError,
-    refetch,
-    getTransactionEntries,
-  } = useServerTransactions(filters, currentPage);
+  const { filteredTransactions, getTransactionEntries } = useTransactions(filters);
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const totalPages = Math.ceil(filteredTransactions.length / PAGE_SIZE);
+  const paginatedTxns = filteredTransactions.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -230,13 +227,7 @@ export default function TransactionsPage() {
     setSelectedTxn(null);
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full min-h-[60vh]">
-        <LoadingSpinner size="h-10 w-10" />
-      </div>
-    );
-  }
+  if (isLoading) return null; // DataGate handles the loading screen
 
   return (
     <div className="space-y-6">
@@ -255,16 +246,8 @@ export default function TransactionsPage() {
         />
       </Card>
 
-      {/* Error banner */}
-      {txnError && (
-        <Card className="p-4 flex items-center gap-3 border-l-4 border-rose-400">
-          <p className="text-sm text-gray-700 flex-1">Failed to load transactions. Please try again.</p>
-          <button onClick={refetch} className="text-sm font-semibold text-brand hover:underline shrink-0">Retry</button>
-        </Card>
-      )}
-
       {/* Content */}
-      {!txnError && paginatedTxns.length === 0 ? (
+      {paginatedTxns.length === 0 ? (
         <EmptyState
           message="No transactions found"
           description="Try adjusting your filters or add a new transaction."
@@ -282,7 +265,7 @@ export default function TransactionsPage() {
           <div className="flex items-center justify-between px-4 md:px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-bold text-gray-900">Recent Activity</h2>
             <p className="text-xs text-gray-400">
-              {paginatedTxns.length} of {totalCount}
+              {paginatedTxns.length} of {filteredTransactions.length}
             </p>
           </div>
 
