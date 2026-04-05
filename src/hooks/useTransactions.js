@@ -17,7 +17,7 @@ import { useData } from '../context/DataContext';
 export function useTransactions(filters = {}) {
   const { transactions, entries, accounts, categories } = useData();
 
-  const { dateFrom, dateTo, type, accountId, categoryId, beneficiary, owner, search } = filters;
+  const { dateFrom, dateTo, type, accountId, categoryId, beneficiary, platform, tag, owner, search } = filters;
 
   // Build lookup maps once
   const accountMap = useMemo(
@@ -84,13 +84,22 @@ export function useTransactions(filters = {}) {
         // Owner exact match
         if (owner && txn.owner !== owner) return false;
 
+        // Platform exact match
+        if (platform && txn.platform !== platform) return false;
+
+        // Tag match — check if the tag appears in the comma-separated tags string
+        if (tag) {
+          const txnTags = String(txn.tags ?? '').split(',').map((s) => s.trim());
+          if (!txnTags.includes(tag)) return false;
+        }
+
         // Account / category filter — check entries
         if (accountId || categoryId) {
           const txnEntries = entriesByTxn.get(txn.id) ?? [];
           if (accountId && !txnEntries.some((e) => e.account_id === accountId)) {
             return false;
           }
-          if (categoryId && !txnEntries.some((e) => e.account_id === categoryId)) {
+          if (categoryId && !txnEntries.some((e) => e.category_id === categoryId)) {
             return false;
           }
         }
@@ -100,7 +109,9 @@ export function useTransactions(filters = {}) {
           const noteMatch = txn.notes?.toLowerCase().includes(searchLower) ?? false;
           const beneficiaryMatch =
             txn.beneficiary?.toLowerCase().includes(searchLower) ?? false;
-          if (!noteMatch && !beneficiaryMatch) return false;
+          const platformMatch =
+            txn.platform?.toLowerCase().includes(searchLower) ?? false;
+          if (!noteMatch && !beneficiaryMatch && !platformMatch) return false;
         }
 
         return true;
@@ -118,7 +129,7 @@ export function useTransactions(filters = {}) {
         const categoryNames = [
           ...new Set(
             txnEntries
-              .map((e) => categoryMap.get(e.account_id)?.name)
+              .map((e) => categoryMap.get(e.category_id)?.name)
               .filter(Boolean)
           ),
         ];
@@ -158,6 +169,8 @@ export function useTransactions(filters = {}) {
     accountId,
     categoryId,
     beneficiary,
+    platform,
+    tag,
     owner,
     search,
   ]);

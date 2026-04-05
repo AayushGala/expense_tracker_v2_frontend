@@ -35,6 +35,7 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
   const [date, setDate] = useState(initialData?.date ?? today);
   const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
   const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
@@ -85,6 +86,7 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
       receivable_account_id: receivableAccount.id,
       settle_receivable_id: parseInt(selectedReceivableId),
       owner,
+      platform: platform.trim(),
       notes: notes.trim(),
     });
   }
@@ -196,6 +198,18 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
               />
             </div>
           )}
+
+          {/* Platform */}
+          <div>
+            <label className={labelClass}>Platform</label>
+            <input
+              type="text"
+              placeholder="e.g. Swiggy, Amazon, Flipkart"
+              value={platform}
+              onChange={(e) => setPlatform(e.target.value)}
+              className={inputClass}
+            />
+          </div>
 
           {/* Notes */}
           <div>

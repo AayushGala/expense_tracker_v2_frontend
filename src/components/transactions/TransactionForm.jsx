@@ -28,8 +28,8 @@ function buildInitialData(transaction, entries, accounts) {
   const accountIds = new Set(accounts.map((a) => a.id));
 
   // Separate entries into account entries and category entries
-  const accountEntries = txnEntries.filter((e) => accountIds.has(e.account_id));
-  const categoryEntries = txnEntries.filter((e) => !accountIds.has(e.account_id));
+  const accountEntries = txnEntries.filter((e) => e.account_id != null);
+  const categoryEntries = txnEntries.filter((e) => e.category_id != null);
 
   const debitAccountEntry = accountEntries.find((e) => e.entry_type === 'DEBIT');
   const creditAccountEntry = accountEntries.find((e) => e.entry_type === 'CREDIT');
@@ -50,7 +50,7 @@ function buildInitialData(transaction, entries, accounts) {
       return {
         ...base,
         from_account_id: creditAccountEntry?.account_id ?? '',
-        category_id: transaction.category_id ?? debitCategoryEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? debitCategoryEntry?.category_id ?? '',
       };
 
     case 'income':
@@ -58,7 +58,7 @@ function buildInitialData(transaction, entries, accounts) {
       return {
         ...base,
         to_account_id: debitAccountEntry?.account_id ?? '',
-        category_id: transaction.category_id ?? creditCategoryEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? creditCategoryEntry?.category_id ?? '',
       };
 
     case 'transfer':
@@ -76,14 +76,14 @@ function buildInitialData(transaction, entries, accounts) {
       return {
         ...base,
         account_id: debitAccountEntry?.account_id ?? '',
-        category_id: transaction.category_id ?? creditCategoryEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? creditCategoryEntry?.category_id ?? '',
       };
 
     case 'split_expense':
       return {
         ...base,
         from_account_id: creditAccountEntry?.account_id ?? '',
-        category_id: transaction.category_id ?? debitCategoryEntry?.account_id ?? '',
+        category_id: transaction.category_id ?? debitCategoryEntry?.category_id ?? '',
       };
 
     case 'reimbursement':

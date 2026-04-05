@@ -54,21 +54,21 @@ export function useReports() {
     [transactions]
   );
 
-  // Expense-type entries only (account_id is a category with type "expense")
+  // Expense-type entries only (category with type "expense")
   const expenseEntries = useMemo(
     () =>
       entries.filter((e) => {
-        const cat = categoryMap.get(e.account_id);
+        const cat = categoryMap.get(e.category_id);
         return cat?.type === 'expense' && e.entry_type === 'DEBIT';
       }),
     [entries, categoryMap]
   );
 
-  // Income-type entries only (account_id is a category with type "income")
+  // Income-type entries only (category with type "income")
   const incomeEntries = useMemo(
     () =>
       entries.filter((e) => {
-        const cat = categoryMap.get(e.account_id);
+        const cat = categoryMap.get(e.category_id);
         return cat?.type === 'income' && e.entry_type === 'CREDIT';
       }),
     [entries, categoryMap]
@@ -132,9 +132,9 @@ export function useReports() {
       if (beneficiary && txn.beneficiary !== beneficiary) continue;
       if (owner && txn.owner !== owner) continue;
 
-      const prev = totals.get(entry.account_id) ?? 0;
+      const prev = totals.get(entry.category_id) ?? 0;
       totals.set(
-        entry.account_id,
+        entry.category_id,
         Math.round((prev + entry.amount) * 100) / 100
       );
     }
@@ -208,7 +208,7 @@ export function useReports() {
     const totals = Object.fromEntries(keys.map((k) => [k, 0]));
 
     for (const entry of expenseEntries) {
-      if (categoryId && entry.account_id !== categoryId) continue;
+      if (categoryId && entry.category_id !== categoryId) continue;
       const txn = txnMap.get(entry.transaction_id);
       if (!txn) continue;
       if (owner && txn.owner !== owner) continue;

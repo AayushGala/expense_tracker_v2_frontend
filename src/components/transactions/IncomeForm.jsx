@@ -24,6 +24,7 @@ export default function IncomeForm({ onSubmit, initialData }) {
   const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
   const [categoryId, setCategoryId] = useState(String(initialData?.category_id ?? ''));
   const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
@@ -61,6 +62,7 @@ export default function IncomeForm({ onSubmit, initialData }) {
       to_account_id: parseInt(toAccountId),
       category_id: parseInt(categoryId),
       owner,
+      platform: platform.trim(),
       notes: notes.trim(),
     });
   }
@@ -146,6 +148,18 @@ export default function IncomeForm({ onSubmit, initialData }) {
           {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
         </div>
       )}
+
+      {/* Platform */}
+      <div>
+        <label className={labelClass}>Platform</label>
+        <input
+          type="text"
+          placeholder="e.g. Swiggy, Amazon, Flipkart"
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value)}
+          className={inputClass}
+        />
+      </div>
 
       {/* Notes */}
       <div>

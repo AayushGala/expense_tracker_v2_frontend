@@ -173,7 +173,8 @@ function transformEntry(e) {
   return {
     ...e,
     transaction_id: e.transaction,
-    account_id: e.account ?? e.category,
+    account_id: e.account,
+    category_id: e.category,
     amount: typeof e.amount === 'string' ? parseFloat(e.amount) : e.amount,
   };
 }

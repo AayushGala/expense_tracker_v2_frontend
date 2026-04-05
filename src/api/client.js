@@ -82,7 +82,10 @@ const api = {
   deleteAccount: (id) => request('DELETE', `/api/accounts/${id}/`),
 
   // Categories
-  getCategories: () => request('GET', '/api/categories/'),
+  getCategories: (params) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return request('GET', `/api/categories/${qs ? '?' + qs : ''}`);
+  },
   createCategory: (data) => request('POST', '/api/categories/', data),
   updateCategory: (id, data) => request('PATCH', `/api/categories/${id}/`, data),
   deleteCategory: (id) => request('DELETE', `/api/categories/${id}/`),
@@ -96,6 +99,8 @@ const api = {
   createTransaction: (data) => request('POST', '/api/transactions/', data),
   updateTransaction: (id, data) => request('PUT', `/api/transactions/${id}/`, data),
   deleteTransaction: (id) => request('DELETE', `/api/transactions/${id}/`),
+  getTransactionTags: () => request('GET', '/api/transactions/tags/'),
+  getTransactionPlatforms: () => request('GET', '/api/transactions/platforms/'),
 
   // Entries
   getEntries: () => request('GET', '/api/entries/'),

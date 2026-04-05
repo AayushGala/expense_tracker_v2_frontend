@@ -32,6 +32,7 @@ export default function CashbackForm({ onSubmit, initialData }) {
   const [date, setDate] = useState(initialData?.date ?? today);
   const [accountId, setAccountId] = useState(String(initialData?.account_id ?? ''));
   const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
@@ -71,6 +72,7 @@ export default function CashbackForm({ onSubmit, initialData }) {
       account_id: parseInt(accountId),
       category_id: cashbackCategory.id,
       owner,
+      platform: platform.trim(),
       notes: notes.trim(),
     });
   }
@@ -139,6 +141,18 @@ export default function CashbackForm({ onSubmit, initialData }) {
           />
         </div>
       )}
+
+      {/* Platform */}
+      <div>
+        <label className={labelClass}>Platform</label>
+        <input
+          type="text"
+          placeholder="e.g. Swiggy, Amazon, Flipkart"
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value)}
+          className={inputClass}
+        />
+      </div>
 
       {/* Notes */}
       <div>

@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
+import api from '../../api/client';
 import Dropdown from './Dropdown';
 import CalendarPicker from './CalendarPicker';
 
@@ -37,6 +39,28 @@ export default function FilterBar({ filters = {}, onChange, onReset, className =
       value: b,
       label: b,
     })),
+  ];
+
+  const [platformList, setPlatformList] = useState([]);
+  const [tagList, setTagList] = useState([]);
+
+  useEffect(() => {
+    api.getTransactionPlatforms().then((data) => {
+      setPlatformList(Array.isArray(data) ? data : (data.results ?? []));
+    }).catch(() => {});
+    api.getTransactionTags().then((data) => {
+      setTagList(Array.isArray(data) ? data : (data.results ?? []));
+    }).catch(() => {});
+  }, []);
+
+  const platformOptions = [
+    { value: '', label: 'Platform' },
+    ...platformList.map((p) => ({ value: p, label: p })),
+  ];
+
+  const tagOptions = [
+    { value: '', label: 'Tag' },
+    ...tagList.map((t) => ({ value: t, label: t })),
   ];
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== '' && v != null);
@@ -96,6 +120,22 @@ export default function FilterBar({ filters = {}, onChange, onReset, className =
           className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[120px] sm:flex-none"
         />
       )}
+
+      {/* Platform */}
+      <Dropdown
+        value={filters.platform ?? ''}
+        onChange={(val) => onChange('platform', val)}
+        options={platformOptions}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[130px] sm:flex-none"
+      />
+
+      {/* Tag */}
+      <Dropdown
+        value={filters.tag ?? ''}
+        onChange={(val) => onChange('tag', val)}
+        options={tagOptions}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[120px] sm:flex-none"
+      />
 
       {/* Beneficiary */}
       {beneficiaryOptions.length > 1 && (

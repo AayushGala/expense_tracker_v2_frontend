@@ -85,9 +85,9 @@ function TransactionRow({ txn, onClick }) {
             <p className="text-sm font-semibold text-gray-900 truncate">
               {txn.notes || txn.type}
             </p>
-            {txn.accountNames?.length > 0 && (
+            {(txn.accountNames?.length > 0 || txn.platform) && (
               <p className="text-xs text-gray-400 truncate mt-0.5">
-                {txn.accountNames.join(' · ')}
+                {[txn.accountNames?.join(' · '), txn.platform].filter(Boolean).join(' · ')}
               </p>
             )}
           </div>
@@ -138,6 +138,7 @@ function TransactionCard({ txn, onClick }) {
         <p className="text-xs text-gray-400 mt-0.5">
           {formatDate(txn.date)}
           {txn.categoryNames?.length > 0 && ` · ${txn.categoryNames[0]}`}
+          {txn.platform && ` · ${txn.platform}`}
         </p>
       </div>
       <AmountDisplay
@@ -216,6 +217,8 @@ const EMPTY_FILTERS = {
   accountId: '',
   categoryId: '',
   beneficiary: '',
+  platform: '',
+  tag: '',
   search: '',
 };
 

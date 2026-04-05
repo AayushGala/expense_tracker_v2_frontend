@@ -28,6 +28,7 @@ export default function InvestmentForm({ onSubmit, initialData }) {
   const [fromAccountId, setFromAccountId] = useState(String(initialData?.from_account_id ?? ''));
   const [toAccountId, setToAccountId] = useState(String(initialData?.to_account_id ?? ''));
   const [owner, setOwner] = useState(initialData?.owner ?? '');
+  const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
 
@@ -68,6 +69,7 @@ export default function InvestmentForm({ onSubmit, initialData }) {
       from_account_id: parseInt(fromAccountId),
       to_account_id: parseInt(toAccountId),
       owner,
+      platform: platform.trim(),
       notes: notes.trim(),
     });
   }
@@ -145,6 +147,18 @@ export default function InvestmentForm({ onSubmit, initialData }) {
             <p className={errorClass}>{errors.toAccountId}</p>
           )}
         </div>
+      </div>
+
+      {/* Platform */}
+      <div>
+        <label className={labelClass}>Platform</label>
+        <input
+          type="text"
+          placeholder="e.g. Swiggy, Amazon, Flipkart"
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value)}
+          className={inputClass}
+        />
       </div>
 
       {/* Notes */}

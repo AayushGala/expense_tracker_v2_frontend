@@ -29,8 +29,10 @@ export default function TransactionDetail({
     [categories]
   );
 
-  function resolveAccountName(id) {
-    return accountMap.get(id)?.name ?? categoryMap.get(id)?.name ?? id;
+  function resolveEntryName(entry) {
+    if (entry.account_id != null) return accountMap.get(entry.account_id)?.name ?? entry.account_id;
+    if (entry.category_id != null) return categoryMap.get(entry.category_id)?.name ?? entry.category_id;
+    return '—';
   }
 
   async function handleDelete() {
@@ -49,16 +51,34 @@ export default function TransactionDetail({
   }
 
   const {
-    type, amount, date, notes, beneficiary, tags,
-    from_account_id, to_account_id, account_id, category_id, created_at,
+    type, amount, date, notes, beneficiary, platform, tags,
+    category_id, created_at,
   } = transaction;
 
+  // Derive account info from entries since the transaction model doesn't store account IDs
+  const accountIds = new Set(accounts.map((a) => a.id));
+  const accountEntries = entries.filter((e) => e.account_id != null);
+  const debitAccount = accountEntries.find((e) => e.entry_type === 'DEBIT');
+  const creditAccount = accountEntries.find((e) => e.entry_type === 'CREDIT');
+
+  // Determine "from" and "to" based on transaction type
+  let fromName = null;
+  let toName = null;
+  if (type === 'expense' || type === 'split_expense') {
+    fromName = creditAccount ? accountMap.get(creditAccount.account_id)?.name : null;
+  } else if (type === 'income' || type === 'cashback' || type === 'reimbursement') {
+    toName = debitAccount ? accountMap.get(debitAccount.account_id)?.name : null;
+  } else if (type === 'transfer' || type === 'bill_payment' || type === 'investment') {
+    fromName = creditAccount ? accountMap.get(creditAccount.account_id)?.name : null;
+    toName = debitAccount ? accountMap.get(debitAccount.account_id)?.name : null;
+  }
+
   const detailRows = [
-    from_account_id && { label: 'From Account', value: resolveAccountName(from_account_id) },
-    to_account_id && { label: 'To Account', value: resolveAccountName(to_account_id) },
-    account_id && !from_account_id && !to_account_id && { label: 'Account', value: resolveAccountName(account_id) },
-    category_id && { label: 'Category', value: resolveAccountName(category_id) },
+    fromName && { label: 'From Account', value: fromName },
+    toName && { label: 'To Account', value: toName },
+    category_id && { label: 'Category', value: categoryMap.get(category_id)?.name ?? transaction.category_name ?? category_id },
     beneficiary && { label: 'Beneficiary', value: beneficiary.charAt(0).toUpperCase() + beneficiary.slice(1) },
+    platform && { label: 'Platform', value: platform },
     tags?.length > 0 && { label: 'Tags', value: Array.isArray(tags) ? tags.join(', ') : tags },
     notes && { label: 'Notes', value: notes },
     created_at && { label: 'Created', value: formatDate(created_at) },
@@ -120,7 +140,7 @@ export default function TransactionDetail({
                 {entries.map((entry) => (
                   <tr key={entry.id} className="bg-white">
                     <td className="px-4 py-2.5 text-gray-700 font-medium truncate max-w-[140px]">
-                      {resolveAccountName(entry.account_id)}
+                      {resolveEntryName(entry)}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-emerald-600 font-medium">
                       {entry.entry_type === 'DEBIT' ? formatINR(entry.amount) : '—'}

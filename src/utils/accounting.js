@@ -123,24 +123,47 @@ function applySignConvention(totals, accountType) {
  */
 export function computeAllBalances(entries, accounts, categories) {
   // Build a lookup map: id -> type
-  const typeLookup = new Map();
+  const accountTypeLookup = new Map();
   for (const account of accounts) {
-    typeLookup.set(account.id, account.type);
+    accountTypeLookup.set(account.id, account.type);
   }
+  const categoryTypeLookup = new Map();
   for (const category of categories) {
-    typeLookup.set(category.id, category.type);
+    categoryTypeLookup.set(category.id, category.type);
   }
-
-  // Collect every unique account ID referenced in entries
-  const accountIds = new Set(entries.map((e) => e.account_id));
 
   const balances = new Map();
 
+  // Compute balances for real accounts (using account_id)
+  const accountIds = new Set(
+    entries.map((e) => e.account_id).filter((id) => id != null)
+  );
   for (const accountId of accountIds) {
     const totals = computeAccountBalance(entries, accountId);
-    const accountType = typeLookup.get(accountId) ?? 'asset'; // default to debit-normal
+    const accountType = accountTypeLookup.get(accountId) ?? 'asset';
     const balance = applySignConvention(totals, accountType);
     balances.set(accountId, balance);
+  }
+
+  // Compute balances for categories (using category_id)
+  const categoryIds = new Set(
+    entries.map((e) => e.category_id).filter((id) => id != null)
+  );
+  for (const categoryId of categoryIds) {
+    let debits = 0;
+    let credits = 0;
+    for (const entry of entries) {
+      if (entry.category_id !== categoryId) continue;
+      if (entry.entry_type === ENTRY_TYPE.DEBIT) debits += entry.amount;
+      else if (entry.entry_type === ENTRY_TYPE.CREDIT) credits += entry.amount;
+    }
+    const totals = {
+      debits: Math.round(debits * 100) / 100,
+      credits: Math.round(credits * 100) / 100,
+    };
+    const categoryType = categoryTypeLookup.get(categoryId) ?? 'expense';
+    const balance = applySignConvention(totals, categoryType);
+    balances.set(categoryId, balance);
   }
 
   return balances;

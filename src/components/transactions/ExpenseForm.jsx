@@ -36,6 +36,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
   const [owner, setOwner] = useState(initialData?.owner ?? '');
   const [beneficiaryType, setBeneficiaryType] = useState(initBeneficiaryType);
   const [customBeneficiary, setCustomBeneficiary] = useState(initCustomBeneficiary);
+  const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [tags, setTags] = useState(initialData?.tags ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
   const [errors, setErrors] = useState({});
@@ -80,6 +81,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
       category_id: parseInt(categoryId),
       beneficiary,
       owner,
+      platform: platform.trim(),
       tags: tags.trim(),
       notes: notes.trim(),
     });
@@ -187,16 +189,16 @@ export default function ExpenseForm({ onSubmit, initialData }) {
         </div>
       )}
 
-      {/* Tags */}
-      <div>
-        <label className={labelClass}>Tags (comma-separated)</label>
-        <input
-          type="text"
-          placeholder="food, travel, utilities"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          className={inputClass}
-        />
+      {/* Platform + Tags */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Platform</label>
+          <input type="text" placeholder="e.g. Swiggy, Amazon" value={platform} onChange={(e) => setPlatform(e.target.value)} className={inputClass} />
+        </div>
+        <div>
+          <label className={labelClass}>Tags (comma-separated)</label>
+          <input type="text" placeholder="food, travel, utilities" value={tags} onChange={(e) => setTags(e.target.value)} className={inputClass} />
+        </div>
       </div>
 
       {/* Notes */}

@@ -34,6 +34,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
   // myShareType: 'equal' (even split) | 'custom' (enter amount directly)
   const [myShareType, setMyShareType] = useState('equal');
   const [customMyShare, setCustomMyShare] = useState('');
+  const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
 
   // Each other person: { id, name, amount }
@@ -132,6 +133,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
       category_id: parseInt(categoryId),
       receivable_account_id: receivableAccount.id,
       owner,
+      platform: platform.trim(),
       notes: notes.trim(),
       receivables: otherPeople.map((person) => ({
         person_name: person.name.trim(),
@@ -289,6 +291,18 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
           Others owe you: <span className="font-bold">₹{othersTotal.toFixed(2)}</span>
         </div>
       )}
+
+      {/* Platform */}
+      <div>
+        <label className={labelClass}>Platform</label>
+        <input
+          type="text"
+          placeholder="e.g. Swiggy, Amazon, Flipkart"
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value)}
+          className={inputClass}
+        />
+      </div>
 
       {/* Notes */}
       <div>

@@ -74,7 +74,7 @@ function OwnerToggle({ value, onChange, options }) {
           onClick={() => onChange(opt)}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all
             ${value === opt
-              ? 'bg-white text-indigo-700 shadow-sm'
+              ? 'bg-white text-[#1e2a30] shadow-sm'
               : 'text-gray-400 hover:text-gray-600'
             }`}
         >
