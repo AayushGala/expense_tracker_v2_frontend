@@ -11,6 +11,7 @@ import ReportsPage from './pages/ReportsPage'
 import SettingsPage from './pages/SettingsPage'
 import TransactionForm from './components/transactions/TransactionForm'
 import LoadingSpinner from './components/common/LoadingSpinner'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
 function AuthGate({ children }) {
   const { isAuthenticated, isLoading } = useAuth()
@@ -62,18 +63,20 @@ export default function App() {
             <AuthGate>
               <DataProvider>
                 <DataGate>
-                  <Routes>
-                    <Route element={<AppLayout />}>
-                      <Route path="/" element={<DashboardPage />} />
-                      <Route path="/transactions" element={<TransactionsPage />} />
-                      <Route path="/transactions/new" element={<TransactionForm />} />
-                      <Route path="/transactions/:id/edit" element={<TransactionForm />} />
-                      <Route path="/accounts" element={<AccountsPage />} />
-                      <Route path="/reports" element={<ReportsPage />} />
-                      <Route path="/settings" element={<SettingsPage />} />
-                    </Route>
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
+                  <ErrorBoundary>
+                    <Routes>
+                      <Route element={<AppLayout />}>
+                        <Route path="/" element={<DashboardPage />} />
+                        <Route path="/transactions" element={<TransactionsPage />} />
+                        <Route path="/transactions/new" element={<TransactionForm />} />
+                        <Route path="/transactions/:id/edit" element={<TransactionForm />} />
+                        <Route path="/accounts" element={<AccountsPage />} />
+                        <Route path="/reports" element={<ReportsPage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
+                      </Route>
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </ErrorBoundary>
                 </DataGate>
               </DataProvider>
             </AuthGate>

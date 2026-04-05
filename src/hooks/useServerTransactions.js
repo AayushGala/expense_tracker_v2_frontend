@@ -15,6 +15,7 @@ export function useServerTransactions(filters = {}, page = 1) {
   const [results, setResults] = useState([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Lookup maps for enrichment
   const accountMap = useMemo(
@@ -64,6 +65,7 @@ export function useServerTransactions(filters = {}, page = 1) {
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
     try {
+      setError(null);
       const data = await api.getTransactions(queryParams);
       // Handle both paginated and non-paginated responses
       const txns = Array.isArray(data) ? data : (data.results ?? []);
@@ -72,6 +74,7 @@ export function useServerTransactions(filters = {}, page = 1) {
       setCount(total);
     } catch (err) {
       console.error('useServerTransactions: fetch failed', err);
+      setError(err.message ?? String(err));
       setResults([]);
       setCount(0);
     } finally {
@@ -136,6 +139,7 @@ export function useServerTransactions(filters = {}, page = 1) {
     transactions: enrichedTransactions,
     totalCount: count,
     isLoading: loading,
+    error,
     refetch: fetchTransactions,
     getTransactionEntries,
   };

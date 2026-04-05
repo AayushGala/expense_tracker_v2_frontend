@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import api from '../api/client';
 
 // ---------------------------------------------------------------------------
@@ -286,50 +286,27 @@ export function DataProvider({ children }) {
 
   const addTransaction = useCallback(async (transactionData) => {
     const result = await api.createTransaction(transactionData);
-
-    const transaction = transformTransaction(result);
-    const entries = (result.entries ?? []).map(transformEntry);
-    const receivables = (result.receivables ?? []).map(transformReceivable);
-
-    dispatch({
-      type: ADD_TRANSACTION,
-      payload: { transaction, entries, receivables },
-    });
-
-    // Reload all data to ensure consistency — entries, receivables,
-    // and account balances are all updated from the backend.
     await loadData();
-
     return result;
   }, [loadData]);
 
   const updateTransaction = useCallback(async (id, transactionData) => {
     const result = await api.updateTransaction(id, transactionData);
-
-    const transaction = transformTransaction(result);
-    const newEntries = (result.entries ?? []).map(transformEntry);
-
-    dispatch({
-      type: UPDATE_TRANSACTION,
-      payload: { id, transaction, newEntries },
-    });
-
     await loadData();
-
     return result;
   }, [loadData]);
 
   const deleteTransaction = useCallback(async (id) => {
     await api.deleteTransaction(id);
-    dispatch({ type: DELETE_TRANSACTION, payload: { id } });
-  }, []);
+    await loadData();
+  }, [loadData]);
 
   // ---------------------------------------------------------------------------
   // Accounts
   // ---------------------------------------------------------------------------
 
   // Build lookup maps from current accountTypes state
-  const { typeNameMap, subTypeNameMap } = (() => {
+  const { typeNameMap, subTypeNameMap } = useMemo(() => {
     const tMap = new Map();
     const sMap = new Map();
     for (const at of state.accountTypes) {
@@ -339,7 +316,7 @@ export function DataProvider({ children }) {
       }
     }
     return { typeNameMap: tMap, subTypeNameMap: sMap };
-  })();
+  }, [state.accountTypes]);
 
   const addAccount = useCallback(async (accountData) => {
     const result = await api.createAccount(accountData);
@@ -454,7 +431,7 @@ export function DataProvider({ children }) {
   // Context value
   // ---------------------------------------------------------------------------
 
-  const value = {
+  const value = useMemo(() => ({
     ...state,
     loadData,
     syncAll,
@@ -474,7 +451,16 @@ export function DataProvider({ children }) {
     updateAccountSubType,
     deleteAccountSubType,
     updateSettings,
-  };
+  }), [
+    state, loadData, syncAll,
+    addTransaction, updateTransaction, deleteTransaction,
+    addAccount, updateAccount,
+    addCategory, updateCategory, deleteCategory,
+    updateReceivable,
+    addAccountType, updateAccountType, deleteAccountType,
+    addAccountSubType, updateAccountSubType, deleteAccountSubType,
+    updateSettings,
+  ]);
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }

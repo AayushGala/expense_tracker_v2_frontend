@@ -234,6 +234,7 @@ export default function TransactionsPage() {
     transactions: paginatedTxns,
     totalCount,
     isLoading: txnLoading,
+    error: txnError,
     refetch,
     getTransactionEntries,
   } = useServerTransactions(filters, currentPage);
@@ -283,8 +284,16 @@ export default function TransactionsPage() {
         />
       </Card>
 
+      {/* Error banner */}
+      {txnError && (
+        <Card className="p-4 flex items-center gap-3 border-l-4 border-rose-400">
+          <p className="text-sm text-gray-700 flex-1">Failed to load transactions. Please try again.</p>
+          <button onClick={refetch} className="text-sm font-semibold text-[#1e2a30] hover:underline shrink-0">Retry</button>
+        </Card>
+      )}
+
       {/* Content */}
-      {paginatedTxns.length === 0 ? (
+      {!txnError && paginatedTxns.length === 0 ? (
         <EmptyState
           message="No transactions found"
           description="Try adjusting your filters or add a new transaction."
