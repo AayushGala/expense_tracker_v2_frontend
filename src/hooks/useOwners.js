@@ -34,15 +34,21 @@ export function useOwners() {
     [owners]
   );
 
-  /** Account-id → owner name lookup. */
-  const accountOwnerMap = useMemo(
-    () => new Map(accounts.filter((a) => a.owner).map((a) => [a.id, a.owner])),
-    [accounts]
-  );
+  /** Account-id → owner name lookup (keyed by both number and string for safe matching). */
+  const accountOwnerMap = useMemo(() => {
+    const map = new Map();
+    for (const a of accounts) {
+      if (a.owner) {
+        map.set(a.id, a.owner);
+        map.set(String(a.id), a.owner);
+      }
+    }
+    return map;
+  }, [accounts]);
 
   /** Returns the owner name for a given account id, or ''. */
   function getAccountOwner(accountId) {
-    return accountOwnerMap.get(accountId) ?? '';
+    return accountOwnerMap.get(accountId) ?? accountOwnerMap.get(String(accountId)) ?? '';
   }
 
   return {
