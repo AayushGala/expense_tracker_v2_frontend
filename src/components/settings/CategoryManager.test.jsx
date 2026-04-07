@@ -267,8 +267,10 @@ describe('CategoryManager', () => {
       expect(screen.getByText('Groceries')).toBeInTheDocument();
     });
 
+    // Click the Delete button closest to "Groceries" (sorted alphabetically: Dining Out, Groceries)
     const deleteButtons = screen.getAllByRole('button', { name: 'Delete' });
-    await user.click(deleteButtons[1]);
+    // Last subcategory Delete under Food is Groceries (alphabetically after Dining Out)
+    await user.click(deleteButtons[2]);
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {

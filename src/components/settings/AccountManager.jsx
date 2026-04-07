@@ -11,11 +11,12 @@ const inputClass =
 // Account Row
 // ---------------------------------------------------------------------------
 
-function AccountRow({ account, hasEntries, onUpdate, owners }) {
+function AccountRow({ account, hasEntries, onUpdate, onDelete, owners }) {
   const [editing, setEditing]     = useState(false);
   const [name, setName]           = useState(account.name);
   const [savingName, setSavingName] = useState(false);
   const [toggling, setToggling]   = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function handleSaveName() {
     const trimmed = name.trim();
@@ -94,16 +95,40 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
             </button>
             <button
               onClick={handleToggleActive}
-              disabled={toggling || (hasEntries && !isInactive)}
-              title={hasEntries && !isInactive ? 'Cannot delete accounts with transactions; deactivate instead.' : ''}
-              className={`text-xs px-2.5 py-1 rounded-lg font-medium shrink-0 disabled:opacity-40 transition-colors ${
+              disabled={toggling}
+              className={`text-xs px-2.5 py-1 rounded-lg font-medium shrink-0 disabled:opacity-40 transition-colors text-gray-400 ${
                 isInactive
-                  ? 'text-emerald-600 hover:bg-emerald-50'
-                  : 'text-amber-600 hover:bg-amber-50'
+                  ? 'hover:text-emerald-600 hover:bg-emerald-50'
+                  : 'hover:text-amber-600 hover:bg-amber-50'
               }`}
             >
               {toggling ? '...' : isInactive ? 'Activate' : 'Deactivate'}
             </button>
+            {confirmDelete ? (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => { onDelete(account.id); setConfirmDelete(false); }}
+                  className="text-xs px-2.5 py-1 bg-brand text-white rounded-lg font-semibold hover:bg-brand-hover transition-colors"
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="text-xs px-2.5 py-1 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                disabled={hasEntries}
+                title={hasEntries ? 'Cannot delete accounts with transactions' : ''}
+                className="text-xs text-gray-400 hover:text-brand px-2 py-1 rounded-lg hover:bg-brand/10 font-medium transition-colors shrink-0 disabled:opacity-30 disabled:hover:text-gray-400 disabled:hover:bg-transparent"
+              >
+                Delete
+              </button>
+            )}
           </div>
         </>
       )}
@@ -115,7 +140,7 @@ function AccountRow({ account, hasEntries, onUpdate, owners }) {
 // Account Group Card (one per account type)
 // ---------------------------------------------------------------------------
 
-function AccountGroupCard({ typeLabel, accounts, accountsWithEntries, onUpdate, owners }) {
+function AccountGroupCard({ typeLabel, accounts, accountsWithEntries, onUpdate, onDelete, owners }) {
   const sorted = useMemo(
     () => [...accounts].sort((a, b) => a.name.localeCompare(b.name)),
     [accounts]
@@ -140,6 +165,7 @@ function AccountGroupCard({ typeLabel, accounts, accountsWithEntries, onUpdate, 
                 account={account}
                 hasEntries={accountsWithEntries.has(account.id)}
                 onUpdate={onUpdate}
+                onDelete={onDelete}
                 owners={owners}
               />
             ))}
@@ -155,7 +181,7 @@ function AccountGroupCard({ typeLabel, accounts, accountsWithEntries, onUpdate, 
 // ---------------------------------------------------------------------------
 
 export default function AccountManager() {
-  const { accounts, entries, accountTypes, addAccount, updateAccount } = useData();
+  const { accounts, entries, accountTypes, addAccount, updateAccount, deleteAccount } = useData();
   const { owners } = useOwners();
 
   const [newName, setNewName]       = useState('');
@@ -263,6 +289,7 @@ export default function AccountManager() {
           accounts={typeAccounts}
           accountsWithEntries={accountsWithEntries}
           onUpdate={updateAccount}
+          onDelete={deleteAccount}
           owners={owners}
         />
       ))}

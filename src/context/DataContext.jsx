@@ -330,6 +330,11 @@ export function DataProvider({ children }) {
     return result;
   }, [typeNameMap, subTypeNameMap]);
 
+  const deleteAccount = useCallback(async (id) => {
+    await api.deleteAccount(id);
+    await loadData();
+  }, [loadData]);
+
   // ---------------------------------------------------------------------------
   // Categories
   // ---------------------------------------------------------------------------
@@ -440,6 +445,7 @@ export function DataProvider({ children }) {
     deleteTransaction,
     addAccount,
     updateAccount,
+    deleteAccount,
     addCategory,
     updateCategory,
     deleteCategory,
@@ -454,7 +460,7 @@ export function DataProvider({ children }) {
   }), [
     state, loadData, syncAll,
     addTransaction, updateTransaction, deleteTransaction,
-    addAccount, updateAccount,
+    addAccount, updateAccount, deleteAccount,
     addCategory, updateCategory, deleteCategory,
     updateReceivable,
     addAccountType, updateAccountType, deleteAccountType,
