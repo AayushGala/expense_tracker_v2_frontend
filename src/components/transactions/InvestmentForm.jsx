@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 
 /**
  * Form for recording an investment (liquid asset → investment account).
@@ -16,10 +16,10 @@ export default function InvestmentForm({ onSubmit, initialData }) {
   const { owners, getAccountOwner } = useOwners();
 
   // Liquid source accounts (assets, e.g. bank accounts)
-  const liquidAccounts = accounts.filter((a) => a.type === 'asset');
+  const liquidAccounts = accounts.filter((a) => a.type === 'asset' && a.is_active !== false);
   // Destination accounts (all accounts that could be investment/brokerage)
   const investmentAccounts = accounts.filter(
-    (a) => a.type === 'asset' || a.type === 'liability'
+    (a) => (a.type === 'asset' || a.type === 'liability') && a.is_active !== false
   );
 
   const today = new Date().toISOString().slice(0, 10);
@@ -111,7 +111,7 @@ export default function InvestmentForm({ onSubmit, initialData }) {
           <Select
             value={fromAccountId}
             onChange={(e) => handleFromAccountChange(e.target.value)}
-            options={liquidAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={liquidAccounts.map(accountOption)}
             placeholder="Select source account"
           />
           {errors.fromAccountId && (
@@ -127,7 +127,7 @@ export default function InvestmentForm({ onSubmit, initialData }) {
           <Select
             value={toAccountId}
             onChange={(e) => setToAccountId(e.target.value)}
-            options={investmentAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={investmentAccounts.map(accountOption)}
             placeholder="Select investment account"
           />
           {errors.toAccountId && (

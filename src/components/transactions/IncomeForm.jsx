@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 
 /**
  * Form for recording an income transaction.
@@ -15,7 +15,7 @@ export default function IncomeForm({ onSubmit, initialData }) {
   const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
-  const assetAccounts = accounts.filter((a) => a.type === 'asset');
+  const assetAccounts = accounts.filter((a) => a.type === 'asset' && a.is_active !== false);
   const incomeCategories = categories.filter((c) => c.type === 'income');
 
   const today = new Date().toISOString().slice(0, 10);
@@ -104,7 +104,7 @@ export default function IncomeForm({ onSubmit, initialData }) {
           <Select
             value={toAccountId}
             onChange={(e) => handleToAccountChange(e.target.value)}
-            options={assetAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={assetAccounts.map(accountOption)}
             placeholder="Select account"
           />
           {errors.toAccountId && <p className={errorClass}>{errors.toAccountId}</p>}

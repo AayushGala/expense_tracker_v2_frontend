@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 
 const PREDEFINED_BENEFICIARIES = ['self', 'family'];
 
@@ -12,7 +12,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
   const { owners, getAccountOwner } = useOwners();
 
   const payableAccounts = accounts.filter(
-    (a) => a.type === 'asset' || a.type === 'liability'
+    (a) => (a.type === 'asset' || a.type === 'liability') && a.is_active !== false
   );
   const expenseCategories = categories.filter((c) => c.type === 'expense');
 
@@ -124,7 +124,7 @@ export default function ExpenseForm({ onSubmit, initialData }) {
           <Select
             value={fromAccountId}
             onChange={(e) => handleFromAccountChange(e.target.value)}
-            options={payableAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={payableAccounts.map(accountOption)}
             placeholder="Select account"
           />
           {errors.fromAccountId && <p className={errorClass}>{errors.fromAccountId}</p>}

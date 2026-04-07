@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 
 /**
  * Form for recording a bill payment (asset account pays off a liability).
@@ -15,8 +15,8 @@ export default function BillPaymentForm({ onSubmit, initialData }) {
   const { accounts } = useData();
   const { owners, getAccountOwner } = useOwners();
 
-  const bankAccounts = accounts.filter((a) => a.type === 'asset');
-  const liabilityAccounts = accounts.filter((a) => a.type === 'liability');
+  const bankAccounts = accounts.filter((a) => a.type === 'asset' && a.is_active !== false);
+  const liabilityAccounts = accounts.filter((a) => a.type === 'liability' && a.is_active !== false);
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -104,7 +104,7 @@ export default function BillPaymentForm({ onSubmit, initialData }) {
           <Select
             value={fromAccountId}
             onChange={(e) => handleFromAccountChange(e.target.value)}
-            options={bankAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={bankAccounts.map(accountOption)}
             placeholder="Select bank account"
           />
           {errors.fromAccountId && (
@@ -120,7 +120,7 @@ export default function BillPaymentForm({ onSubmit, initialData }) {
           <Select
             value={toAccountId}
             onChange={(e) => setToAccountId(e.target.value)}
-            options={liabilityAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={liabilityAccounts.map(accountOption)}
             placeholder="Select liability account"
           />
           {errors.toAccountId && (

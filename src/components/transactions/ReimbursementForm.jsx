@@ -4,7 +4,7 @@ import { useOwners } from '../../hooks/useOwners';
 import { formatINR } from '../../utils/formatters';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 
 /**
  * Form for recording reimbursement received from someone.
@@ -17,7 +17,7 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
   const { accounts, receivables } = useData();
   const { owners, getAccountOwner } = useOwners();
 
-  const assetAccounts = accounts.filter((a) => a.type === 'asset');
+  const assetAccounts = accounts.filter((a) => a.type === 'asset' && a.is_active !== false);
   const receivableAccount = accounts.find((a) => a.type === 'receivable') ?? null;
 
   const isEditing = Boolean(initialData);
@@ -196,7 +196,7 @@ export default function ReimbursementForm({ onSubmit, initialData }) {
                   setToAccountId(e.target.value);
                   setOwner(getAccountOwner(e.target.value));
                 }}
-                options={assetAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+                options={assetAccounts.map(accountOption)}
                 placeholder="Select account"
               />
               {errors.toAccountId && (

@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 import { formatINR } from '../../utils/formatters';
 
 /**
@@ -17,7 +17,7 @@ export default function TransferForm({ onSubmit, initialData }) {
   const { owners, getAccountOwner } = useOwners();
 
   const eligibleAccounts = accounts.filter(
-    (a) => a.type === 'asset' || a.type === 'liability'
+    (a) => (a.type === 'asset' || a.type === 'liability') && a.is_active !== false
   );
 
   const expenseCategories = categories.filter((c) => c.type === 'expense');
@@ -132,7 +132,7 @@ export default function TransferForm({ onSubmit, initialData }) {
           <Select
             value={fromAccountId}
             onChange={(e) => handleFromAccountChange(e.target.value)}
-            options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={eligibleAccounts.map(accountOption)}
             placeholder="Select source account"
           />
           {errors.fromAccountId && (
@@ -148,7 +148,7 @@ export default function TransferForm({ onSubmit, initialData }) {
           <Select
             value={toAccountId}
             onChange={(e) => setToAccountId(e.target.value)}
-            options={eligibleAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={eligibleAccounts.map(accountOption)}
             placeholder="Select destination account"
           />
           {errors.toAccountId && (

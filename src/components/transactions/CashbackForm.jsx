@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
 
 /**
  * Form for recording cashback received into an account.
@@ -15,7 +15,7 @@ export default function CashbackForm({ onSubmit, initialData }) {
   const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
-  const assetAccounts = accounts.filter((a) => a.type === 'asset');
+  const assetAccounts = accounts.filter((a) => a.type === 'asset' && a.is_active !== false);
 
   // Find cashback income category — prefer name containing "cashback", else first income
   const cashbackCategory = useMemo(() => {
@@ -121,7 +121,7 @@ export default function CashbackForm({ onSubmit, initialData }) {
           <Select
             value={accountId}
             onChange={(e) => handleAccountChange(e.target.value)}
-            options={assetAccounts.map((a) => ({ value: String(a.id), label: a.name }))}
+            options={assetAccounts.map(accountOption)}
             placeholder="Select account"
           />
           {errors.accountId && <p className={errorClass}>{errors.accountId}</p>}
