@@ -269,10 +269,12 @@ export default function CategoryManager() {
       childrenMap.get(parentId).push(cat);
     }
   }
-  const hierarchical = topLevel.map((cat) => ({
-    ...cat,
-    children: childrenMap.get(cat.id) ?? [],
-  }));
+  const hierarchical = topLevel
+    .map((cat) => ({
+      ...cat,
+      children: (childrenMap.get(cat.id) ?? []).sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const grouped = {
     expense: hierarchical.filter((c) => c.type === 'expense'),
