@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import api from '../api/client';
 
 // ---------------------------------------------------------------------------
@@ -238,8 +238,13 @@ export function DataProvider({ children }) {
   // loadData
   // ---------------------------------------------------------------------------
 
+  const initialLoadDone = useRef(false);
+
   const loadData = useCallback(async () => {
-    dispatch({ type: SET_LOADING, payload: true });
+    // Only show the loading screen on the very first load
+    if (!initialLoadDone.current) {
+      dispatch({ type: SET_LOADING, payload: true });
+    }
     try {
       const data = await api.getAllData();
 
@@ -270,6 +275,7 @@ export function DataProvider({ children }) {
           settings: data.settings ?? {},
         },
       });
+      initialLoadDone.current = true;
     } catch (err) {
       console.error('DataContext: loadData failed', err);
       dispatch({ type: SET_ERROR, payload: err.message ?? String(err) });

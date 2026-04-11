@@ -125,7 +125,7 @@ export default function TransactionForm() {
       } else {
         await addTransaction(transactionData);
       }
-      navigate(-1);
+      navigate('/transactions');
     } catch (err) {
       console.error('TransactionForm: submit failed', err);
       setSubmitting(false);

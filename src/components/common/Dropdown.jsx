@@ -10,14 +10,25 @@ function closeAll() {
 
 export default function Dropdown({ value, onChange, options = [], placeholder, className = '' }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
+  const searchRef = useRef(null);
   const optionRefs = useRef([]);
   const focusedIndexRef = useRef(-1);
   const [menuStyle, setMenuStyle] = useState({});
 
   const selectedOption = options.find((o) => o.value === value);
   const displayLabel = selectedOption?.label ?? placeholder ?? 'Select...';
+
+  // Filter options by search term
+  const searchLower = search.toLowerCase();
+  const filteredOptions = search
+    ? options.filter((o) => o.label.toLowerCase().includes(searchLower))
+    : options;
+
+  // Always show search for quick filtering
+  const showSearch = true;
 
   // Register/unregister this dropdown's close function
   const closeFn = useCallback(() => setOpen(false), []);
@@ -31,11 +42,16 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     return () => openDropdowns.delete(closeFn);
   }, [open, closeFn]);
 
-  // Track focused index when menu opens (don't auto-focus to avoid layout shift)
+  // Reset search and focus search input when menu opens/closes
   useEffect(() => {
     if (open) {
+      setSearch('');
       const selectedIdx = options.findIndex((o) => o.value === value);
       focusedIndexRef.current = selectedIdx >= 0 ? selectedIdx : 0;
+      // Focus search input if shown, otherwise track index only
+      if (showSearch) {
+        requestAnimationFrame(() => searchRef.current?.focus());
+      }
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -131,16 +147,20 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     switch (e.key) {
       case 'ArrowDown': {
         e.preventDefault();
-        const next = idx < options.length - 1 ? idx + 1 : idx;
+        const next = idx < filteredOptions.length - 1 ? idx + 1 : idx;
         focusedIndexRef.current = next;
         optionRefs.current[next]?.focus();
         break;
       }
       case 'ArrowUp': {
         e.preventDefault();
-        const prev = idx > 0 ? idx - 1 : idx;
-        focusedIndexRef.current = prev;
-        optionRefs.current[prev]?.focus();
+        if (idx === 0 && showSearch) {
+          searchRef.current?.focus();
+        } else {
+          const prev = idx > 0 ? idx - 1 : idx;
+          focusedIndexRef.current = prev;
+          optionRefs.current[prev]?.focus();
+        }
         break;
       }
       case 'Enter':
@@ -157,7 +177,7 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
       }
       case 'End': {
         e.preventDefault();
-        const last = options.length - 1;
+        const last = filteredOptions.length - 1;
         focusedIndexRef.current = last;
         optionRefs.current[last]?.focus();
         break;
@@ -169,6 +189,7 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
 
   function handleSelect(optValue) {
     onChange(optValue);
+    setSearch('');
     setOpen(false);
     triggerRef.current?.focus();
   }
@@ -211,42 +232,74 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
           ref={menuRef}
           role="listbox"
           style={menuStyle}
-          className="z-[9999] rounded-xl border border-gray-200 bg-white shadow-xl py-1 max-h-60 overflow-y-auto"
+          className="z-[9999] rounded-xl border border-gray-200 bg-white shadow-xl flex flex-col max-h-60"
         >
-          {options.map((opt, idx) => {
-            const isSelected = opt.value === value;
-            return (
-              <button
-                key={opt.value}
-                ref={(el) => (optionRefs.current[idx] = el)}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSelect(opt.value);
-                }}
-                onKeyDown={(e) => handleOptionKeyDown(e, idx, opt.value)}
-                className={`
-                  w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2
-                  ${isSelected
-                    ? 'bg-accent-light text-brand font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50'
+          {/* Search input */}
+          {showSearch && (
+            <div className="p-2 border-b border-gray-100 shrink-0">
+              <input
+                ref={searchRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') { setOpen(false); triggerRef.current?.focus(); }
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    optionRefs.current[0]?.focus();
                   }
-                `}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-3.5 w-3.5 flex-shrink-0 ${isSelected ? 'text-accent' : 'text-transparent'}`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                <span className="truncate">{opt.label}</span>
-              </button>
-            );
-          })}
+                  if (e.key === 'Enter' && filteredOptions.length === 1) {
+                    e.preventDefault();
+                    handleSelect(filteredOptions[0].value);
+                  }
+                }}
+                placeholder="Search..."
+                className="w-full text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20 placeholder-gray-400"
+              />
+            </div>
+          )}
+
+          {/* Options */}
+          <div className="overflow-y-auto py-1">
+            {filteredOptions.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-3">No matches</p>
+            ) : (
+              filteredOptions.map((opt, idx) => {
+                const isSelected = opt.value === value;
+                return (
+                  <button
+                    key={opt.value}
+                    ref={(el) => (optionRefs.current[idx] = el)}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelect(opt.value);
+                    }}
+                    onKeyDown={(e) => handleOptionKeyDown(e, idx, opt.value)}
+                    className={`
+                      w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2
+                      ${isSelected
+                        ? 'bg-accent-light text-brand font-semibold'
+                        : 'text-gray-700 hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-3.5 w-3.5 flex-shrink-0 ${isSelected ? 'text-accent' : 'text-transparent'}`}
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span className="truncate">{opt.label}</span>
+                  </button>
+                );
+              })
+            )}
+          </div>
         </div>,
         document.body
       )}
