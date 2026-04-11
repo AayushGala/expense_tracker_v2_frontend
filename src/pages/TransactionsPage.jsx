@@ -6,11 +6,10 @@ import FilterBar from '../components/common/FilterBar';
 import Badge from '../components/common/Badge';
 import AmountDisplay from '../components/common/AmountDisplay';
 import EmptyState from '../components/common/EmptyState';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import Modal from '../components/common/Modal';
 import Card from '../components/common/Card';
 import TransactionDetail from '../components/transactions/TransactionDetail';
-import { formatDate, formatRelativeDate, transactionTypeLabel } from '../utils/formatters';
+import { formatDate, transactionTypeLabel } from '../utils/formatters';
 import TypeIcon, { getVariant } from '../components/common/TypeIcon';
 
 // ---------------------------------------------------------------------------
@@ -327,7 +326,7 @@ export default function TransactionsPage() {
             transaction={selectedTxn}
             entries={getTransactionEntries(selectedTxn.id)}
             onClose={handleModalClose}
-            onDeleted={() => { setSelectedTxn(null); refetch(); }}
+            onDeleted={() => { setSelectedTxn(null); }}
           />
         )}
       </Modal>

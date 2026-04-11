@@ -282,9 +282,6 @@ export function DataProvider({ children }) {
     }
   }, []);
 
-  const syncAll = useCallback(async () => {
-    await loadData();
-  }, [loadData]);
 
   // ---------------------------------------------------------------------------
   // Transactions
@@ -445,7 +442,6 @@ export function DataProvider({ children }) {
   const value = useMemo(() => ({
     ...state,
     loadData,
-    syncAll,
     addTransaction,
     updateTransaction,
     deleteTransaction,
@@ -464,7 +460,7 @@ export function DataProvider({ children }) {
     deleteAccountSubType,
     updateSettings,
   }), [
-    state, loadData, syncAll,
+    state, loadData,
     addTransaction, updateTransaction, deleteTransaction,
     addAccount, updateAccount, deleteAccount,
     addCategory, updateCategory, deleteCategory,

@@ -51,15 +51,6 @@ export function useTransactions(filters = {}) {
     return entriesByTxn.get(txnId) ?? [];
   }
 
-  /**
-   * Finds a single transaction by id.
-   * @param {string} id
-   * @returns {Object|undefined}
-   */
-  function getTransactionById(id) {
-    return transactions.find((t) => t.id === id);
-  }
-
   // Enrich + filter + sort
   const filteredTransactions = useMemo(() => {
     const searchLower = search ? search.toLowerCase() : '';
@@ -179,6 +170,5 @@ export function useTransactions(filters = {}) {
   return {
     filteredTransactions,
     getTransactionEntries,
-    getTransactionById,
   };
 }

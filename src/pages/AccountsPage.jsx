@@ -3,7 +3,6 @@ import { useAccounts } from '../hooks/useAccounts';
 import { useOwners } from '../hooks/useOwners';
 import { useData } from '../context/DataContext';
 import Card from '../components/common/Card';
-import Badge from '../components/common/Badge';
 import AmountDisplay from '../components/common/AmountDisplay';
 import EmptyState from '../components/common/EmptyState';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -20,18 +19,6 @@ const ACCOUNT_SECTIONS = [
   { key: 'liability',  label: 'Liabilities',  badgeType: 'expense' },
   { key: 'receivable', label: 'Receivables',  badgeType: 'transfer' },
 ];
-
-const ACCOUNT_TYPES = [
-  { value: 'asset',      label: 'Asset' },
-  { value: 'liability',  label: 'Liability' },
-  { value: 'receivable', label: 'Receivable' },
-];
-
-const ACCOUNT_SUB_TYPES = {
-  asset:      ['bank', 'cash', 'wallet', 'brokerage', 'savings', 'other'],
-  liability:  ['credit_card', 'loan', 'mortgage', 'other'],
-  receivable: ['receivable'],
-};
 
 // ---------------------------------------------------------------------------
 // Helpers

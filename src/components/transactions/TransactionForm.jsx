@@ -24,9 +24,6 @@ function buildInitialData(transaction, entries, accounts) {
     (e) => e.transaction_id === transaction.id
   );
 
-  // Build a set of account IDs for quick lookup
-  const accountIds = new Set(accounts.map((a) => a.id));
-
   // Separate entries into account entries and category entries
   const accountEntries = txnEntries.filter((e) => e.account_id != null);
   const categoryEntries = txnEntries.filter((e) => e.category_id != null);
