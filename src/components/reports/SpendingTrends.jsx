@@ -15,6 +15,7 @@ import { useOwners } from '../../hooks/useOwners';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useData } from '../../context/DataContext';
 import { formatINR, formatDate } from '../../utils/formatters';
+import { categoryOptions } from '../../utils/formStyles';
 
 function shortMonth(monthKey) {
   const [year, month] = monthKey.split('-');
@@ -92,7 +93,7 @@ export default function SpendingTrends() {
           onChange={setSelectedCategory}
           options={[
             { value: '', label: 'All categories' },
-            ...expenseCategories.map((c) => ({ value: c.id, label: c.name })),
+            ...categoryOptions(expenseCategories),
           ]}
           className="min-w-[180px]"
         />

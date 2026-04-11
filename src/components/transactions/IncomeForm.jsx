@@ -3,7 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import CalendarPicker from '../common/CalendarPicker';
 import Select from '../common/Select';
-import { inputClass, labelClass, errorClass, accountOption } from '../../utils/formStyles';
+import { inputClass, labelClass, errorClass, accountOption, categoryOptions } from '../../utils/formStyles';
 
 /**
  * Form for recording an income transaction.
@@ -119,7 +119,7 @@ export default function IncomeForm({ onSubmit, initialData }) {
             <Select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              options={incomeCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+              options={categoryOptions(incomeCategories)}
               placeholder="Select category"
             />
             {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}
@@ -141,7 +141,7 @@ export default function IncomeForm({ onSubmit, initialData }) {
           <Select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            options={incomeCategories.map((c) => ({ value: String(c.id), label: c.name }))}
+            options={categoryOptions(incomeCategories)}
             placeholder="Select category"
           />
           {errors.categoryId && <p className={errorClass}>{errors.categoryId}</p>}

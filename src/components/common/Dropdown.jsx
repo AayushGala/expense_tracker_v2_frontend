@@ -248,9 +248,12 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
                     e.preventDefault();
                     optionRefs.current[0]?.focus();
                   }
-                  if (e.key === 'Enter' && filteredOptions.length === 1) {
-                    e.preventDefault();
-                    handleSelect(filteredOptions[0].value);
+                  if (e.key === 'Enter') {
+                    const selectable = filteredOptions.filter((o) => !o.disabled);
+                    if (selectable.length === 1) {
+                      e.preventDefault();
+                      handleSelect(selectable[0].value);
+                    }
                   }
                 }}
                 placeholder="Search..."
@@ -265,6 +268,16 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
               <p className="text-sm text-gray-400 text-center py-3">No matches</p>
             ) : (
               filteredOptions.map((opt, idx) => {
+                if (opt.disabled) {
+                  return (
+                    <div
+                      key={opt.value}
+                      className="px-3 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                    >
+                      {opt.label}
+                    </div>
+                  );
+                }
                 const isSelected = opt.value === value;
                 return (
                   <button

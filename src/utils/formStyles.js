@@ -7,3 +7,40 @@ export function accountOption(a) {
   const label = a.owner ? `${a.name} · ${a.owner}` : a.name;
   return { value: String(a.id), label };
 }
+
+/**
+ * Build hierarchical category options for dropdowns.
+ * Parents with children become group headers (indented children below).
+ * Parents without children are selectable directly.
+ */
+export function categoryOptions(categories) {
+  // Separate parents and children
+  const parents = categories.filter((c) => !c.parent && !c.parent_id);
+  const childrenMap = new Map();
+  for (const cat of categories) {
+    const parentId = cat.parent ?? cat.parent_id;
+    if (parentId) {
+      if (!childrenMap.has(parentId)) childrenMap.set(parentId, []);
+      childrenMap.get(parentId).push(cat);
+    }
+  }
+
+  const options = [];
+  const sorted = [...parents].sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const parent of sorted) {
+    const children = (childrenMap.get(parent.id) ?? []).sort((a, b) => a.name.localeCompare(b.name));
+    if (children.length > 0) {
+      // Parent as a non-selectable group header
+      options.push({ value: `__group_${parent.id}`, label: parent.name, disabled: true });
+      for (const child of children) {
+        options.push({ value: String(child.id), label: `  ${child.name}` });
+      }
+    } else {
+      // No children — parent is selectable
+      options.push({ value: String(parent.id), label: parent.name });
+    }
+  }
+
+  return options;
+}
