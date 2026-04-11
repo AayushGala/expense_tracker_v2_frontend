@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useData } from '../context/DataContext';
-import { computeAllBalances, computeNetWorth } from '../utils/accounting';
+import { computeAccountBalances, computeNetWorth } from '../utils/accounting';
 
 /**
  * Custom hook that exposes account data, grouped accounts, balances, net worth,
@@ -27,10 +27,10 @@ export function useAccounts() {
     return grouped;
   }, [activeAccounts]);
 
-  // Compute signed balances for every account and category referenced in entries
+  // Compute signed balances for real accounts only
   const balances = useMemo(
-    () => computeAllBalances(entries, activeAccounts, categories),
-    [entries, activeAccounts, categories]
+    () => computeAccountBalances(entries, activeAccounts),
+    [entries, activeAccounts]
   );
 
   // Net worth: assets + receivables − liabilities

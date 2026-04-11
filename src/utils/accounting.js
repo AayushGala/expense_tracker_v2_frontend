@@ -49,13 +49,13 @@ export function validateEntries(entries) {
 /**
  * Computes the raw debit and credit totals for a specific account across all
  * provided entries.  Sign logic is intentionally omitted here — the caller
- * (computeAllBalances) applies the correct sign based on account type.
+ * (computeAccountBalances) applies the correct sign based on account type.
  *
  * @param {Array<{account_id: string, amount: number, entry_type: string}>} entries
  * @param {string} accountId
  * @returns {{ debits: number, credits: number }}
  */
-export function computeAccountBalance(entries, accountId) {
+export function computeRawBalance(entries, accountId) {
   let debits = 0;
   let credits = 0;
 
@@ -103,48 +103,51 @@ function applySignConvention(totals, accountType) {
 }
 
 /**
- * Computes the signed balance for every account (real accounts + categories used as
- * accounts in entries) and returns a Map of accountId -> balance.
+ * Computes the signed balance for every real account.
  *
- * Real accounts are identified by the "a_" prefix and carry a `type` field
- * ("asset", "liability", "equity", "receivable").
- *
- * Categories are identified by the "cat_" prefix and carry a `type` field
- * ("expense", "income").
- *
- * @param {Array<{account_id: string, amount: number, entry_type: string}>} entries
- * @param {Array<{id: string, type: string}>} accounts  - real accounts (a_ prefix)
- * @param {Array<{id: string, type: string}>} categories - category accounts (c_ prefix)
- * @returns {Map<string, number>} Map of accountId -> signed balance
+ * @param {Array<{account_id: number, amount: number, entry_type: string}>} entries
+ * @param {Array<{id: number, type: string}>} accounts
+ * @returns {Map<number, number>} Map of accountId -> signed balance
  */
-export function computeAllBalances(entries, accounts, categories) {
-  // Build a lookup map: id -> type
+export function computeAccountBalances(entries, accounts) {
   const accountTypeLookup = new Map();
   for (const account of accounts) {
     accountTypeLookup.set(account.id, account.type);
   }
-  const categoryTypeLookup = new Map();
-  for (const category of categories) {
-    categoryTypeLookup.set(category.id, category.type);
-  }
 
-  const balances = new Map();
-
-  // Compute balances for real accounts (using account_id)
   const accountIds = new Set(
     entries.map((e) => e.account_id).filter((id) => id != null)
   );
+
+  const balances = new Map();
   for (const accountId of accountIds) {
-    const totals = computeAccountBalance(entries, accountId);
+    const totals = computeRawBalance(entries, accountId);
     const accountType = accountTypeLookup.get(accountId) ?? 'asset';
     const balance = applySignConvention(totals, accountType);
     balances.set(accountId, balance);
   }
 
-  // Compute balances for categories (using category_id)
+  return balances;
+}
+
+/**
+ * Computes the signed balance for every category.
+ *
+ * @param {Array<{category_id: number, amount: number, entry_type: string}>} entries
+ * @param {Array<{id: number, type: string}>} categories
+ * @returns {Map<number, number>} Map of categoryId -> signed balance
+ */
+export function computeCategoryBalances(entries, categories) {
+  const categoryTypeLookup = new Map();
+  for (const category of categories) {
+    categoryTypeLookup.set(category.id, category.type);
+  }
+
   const categoryIds = new Set(
     entries.map((e) => e.category_id).filter((id) => id != null)
   );
+
+  const balances = new Map();
   for (const categoryId of categoryIds) {
     let debits = 0;
     let credits = 0;
@@ -169,7 +172,7 @@ export function computeAllBalances(entries, accounts, categories) {
  * Computes net worth as: sum of asset/receivable balances − sum of liability balances.
  * Income, expense, and equity accounts are excluded from the net-worth calculation.
  *
- * @param {Map<string, number>} balances - from computeAllBalances
+ * @param {Map<number, number>} balances - from computeAccountBalances
  * @param {Array<{id: string, type: string}>} accounts - real accounts only
  * @returns {number}
  */

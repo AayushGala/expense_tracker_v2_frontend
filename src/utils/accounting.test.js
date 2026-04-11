@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   ENTRY_TYPE,
   validateEntries,
-  computeAccountBalance,
-  computeAllBalances,
+  computeRawBalance,
+  computeAccountBalances,
+  computeCategoryBalances,
   computeNetWorth,
 } from './accounting';
 
@@ -65,17 +66,17 @@ describe('validateEntries', () => {
 });
 
 // ---------------------------------------------------------------------------
-// computeAccountBalance
+// computeRawBalance
 // ---------------------------------------------------------------------------
 
-describe('computeAccountBalance', () => {
+describe('computeRawBalance', () => {
   it('computes debits and credits for a specific account', () => {
     const entries = [
       { account_id: 'a_1', amount: 500, entry_type: ENTRY_TYPE.DEBIT },
       { account_id: 'a_1', amount: 200, entry_type: ENTRY_TYPE.CREDIT },
       { account_id: 'a_2', amount: 300, entry_type: ENTRY_TYPE.DEBIT },
     ];
-    const result = computeAccountBalance(entries, 'a_1');
+    const result = computeRawBalance(entries, 'a_1');
     expect(result.debits).toBe(500);
     expect(result.credits).toBe(200);
   });
@@ -84,7 +85,7 @@ describe('computeAccountBalance', () => {
     const entries = [
       { account_id: 'a_1', amount: 100, entry_type: ENTRY_TYPE.DEBIT },
     ];
-    const result = computeAccountBalance(entries, 'a_99');
+    const result = computeRawBalance(entries, 'a_99');
     expect(result.debits).toBe(0);
     expect(result.credits).toBe(0);
   });
@@ -96,25 +97,24 @@ describe('computeAccountBalance', () => {
       { account_id: 'a_1', amount: 75, entry_type: ENTRY_TYPE.DEBIT },
       { account_id: 'a_1', amount: 25, entry_type: ENTRY_TYPE.CREDIT },
     ];
-    const result = computeAccountBalance(entries, 'a_1');
+    const result = computeRawBalance(entries, 'a_1');
     expect(result.debits).toBe(175);
     expect(result.credits).toBe(75);
   });
 });
 
 // ---------------------------------------------------------------------------
-// computeAllBalances
+// computeAccountBalances
 // ---------------------------------------------------------------------------
 
-describe('computeAllBalances', () => {
+describe('computeAccountBalances', () => {
   it('computes signed balances for asset (debit-normal) accounts', () => {
     const entries = [
       { account_id: 'a_1', amount: 1000, entry_type: ENTRY_TYPE.DEBIT },
       { account_id: 'a_1', amount: 300, entry_type: ENTRY_TYPE.CREDIT },
     ];
     const accounts = [{ id: 'a_1', type: 'asset' }];
-    const balances = computeAllBalances(entries, accounts, []);
-    // asset: debits - credits = 1000 - 300 = 700
+    const balances = computeAccountBalances(entries, accounts);
     expect(balances.get('a_1')).toBe(700);
   });
 
@@ -124,33 +124,8 @@ describe('computeAllBalances', () => {
       { account_id: 'a_2', amount: 800, entry_type: ENTRY_TYPE.CREDIT },
     ];
     const accounts = [{ id: 'a_2', type: 'liability' }];
-    const balances = computeAllBalances(entries, accounts, []);
-    // liability: credits - debits = 800 - 200 = 600
+    const balances = computeAccountBalances(entries, accounts);
     expect(balances.get('a_2')).toBe(600);
-  });
-
-  it('computes balances for categories using category_id', () => {
-    const entries = [
-      { account_id: 'a_1', category_id: 'cat_1', amount: 500, entry_type: ENTRY_TYPE.DEBIT },
-      { account_id: 'a_1', category_id: 'cat_1', amount: 100, entry_type: ENTRY_TYPE.CREDIT },
-    ];
-    const accounts = [{ id: 'a_1', type: 'asset' }];
-    const categories = [{ id: 'cat_1', type: 'expense' }];
-    const balances = computeAllBalances(entries, accounts, categories);
-    // expense: debits - credits = 500 - 100 = 400
-    expect(balances.get('cat_1')).toBe(400);
-  });
-
-  it('computes income category as credit-normal', () => {
-    const entries = [
-      { account_id: 'a_1', category_id: 'cat_2', amount: 50, entry_type: ENTRY_TYPE.DEBIT },
-      { account_id: 'a_1', category_id: 'cat_2', amount: 1000, entry_type: ENTRY_TYPE.CREDIT },
-    ];
-    const accounts = [{ id: 'a_1', type: 'asset' }];
-    const categories = [{ id: 'cat_2', type: 'income' }];
-    const balances = computeAllBalances(entries, accounts, categories);
-    // income: credits - debits = 1000 - 50 = 950
-    expect(balances.get('cat_2')).toBe(950);
   });
 
   it('handles multiple accounts of different types', () => {
@@ -164,10 +139,47 @@ describe('computeAllBalances', () => {
       { id: 'a_2', type: 'liability' },
       { id: 'a_3', type: 'receivable' },
     ];
-    const balances = computeAllBalances(entries, accounts, []);
+    const balances = computeAccountBalances(entries, accounts);
     expect(balances.get('a_1')).toBe(5000);
     expect(balances.get('a_2')).toBe(3000);
     expect(balances.get('a_3')).toBe(2000);
+  });
+
+  it('does not include category entries in account balances', () => {
+    const entries = [
+      { account_id: 1, amount: 1000, entry_type: ENTRY_TYPE.DEBIT },
+      { account_id: null, category_id: 1, amount: 1000, entry_type: ENTRY_TYPE.CREDIT },
+    ];
+    const accounts = [{ id: 1, type: 'asset' }];
+    const balances = computeAccountBalances(entries, accounts);
+    // Only the account entry counts, category entry has account_id: null
+    expect(balances.get(1)).toBe(1000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeCategoryBalances
+// ---------------------------------------------------------------------------
+
+describe('computeCategoryBalances', () => {
+  it('computes expense category as debit-normal', () => {
+    const entries = [
+      { category_id: 'cat_1', amount: 500, entry_type: ENTRY_TYPE.DEBIT },
+      { category_id: 'cat_1', amount: 100, entry_type: ENTRY_TYPE.CREDIT },
+    ];
+    const categories = [{ id: 'cat_1', type: 'expense' }];
+    const balances = computeCategoryBalances(entries, categories);
+    expect(balances.get('cat_1')).toBe(400);
+  });
+
+  it('computes income category as credit-normal', () => {
+    const entries = [
+      { category_id: 'cat_2', amount: 50, entry_type: ENTRY_TYPE.DEBIT },
+      { category_id: 'cat_2', amount: 1000, entry_type: ENTRY_TYPE.CREDIT },
+    ];
+    const categories = [{ id: 'cat_2', type: 'income' }];
+    const balances = computeCategoryBalances(entries, categories);
+    expect(balances.get('cat_2')).toBe(950);
   });
 });
 
