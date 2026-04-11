@@ -17,7 +17,7 @@ import { useData } from '../context/DataContext';
 export function useTransactions(filters = {}) {
   const { transactions, entries, accounts, categories } = useData();
 
-  const { dateFrom, dateTo, type, accountId, categoryId, beneficiary, platform, tag, owner, search } = filters;
+  const { dateFrom, dateTo, type, accountId, categoryIds, beneficiary, platform, tag, owner, search } = filters;
 
   // Build lookup maps once
   const accountMap = useMemo(
@@ -94,12 +94,13 @@ export function useTransactions(filters = {}) {
         }
 
         // Account / category filter — check entries
-        if (accountId || categoryId) {
+        const hasCategoryFilter = categoryIds && categoryIds.length > 0;
+        if (accountId || hasCategoryFilter) {
           const txnEntries = entriesByTxn.get(txn.id) ?? [];
           if (accountId && !txnEntries.some((e) => e.account_id === accountId)) {
             return false;
           }
-          if (categoryId && !txnEntries.some((e) => e.category_id === categoryId)) {
+          if (hasCategoryFilter && !txnEntries.some((e) => categoryIds.includes(e.category_id))) {
             return false;
           }
         }
@@ -167,7 +168,7 @@ export function useTransactions(filters = {}) {
     dateTo,
     type,
     accountId,
-    categoryId,
+    categoryIds,
     beneficiary,
     platform,
     tag,

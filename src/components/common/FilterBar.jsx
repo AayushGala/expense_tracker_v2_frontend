@@ -3,6 +3,7 @@ import { useData } from '../../context/DataContext';
 import { useOwners } from '../../hooks/useOwners';
 import api from '../../api/client';
 import Dropdown from './Dropdown';
+import CategoryFilter from './CategoryFilter';
 import CalendarPicker from './CalendarPicker';
 
 const TRANSACTION_TYPES = [
@@ -28,10 +29,7 @@ export default function FilterBar({ filters = {}, onChange, onReset, className =
       .map((a) => ({ value: a.id, label: a.name })),
   ];
 
-  const categoryOptions = [
-    { value: '', label: 'Category' },
-    ...categories.map((c) => ({ value: c.id, label: c.name })),
-  ];
+  const categoryIds = filters.categoryIds ?? [];
 
   const beneficiaryOptions = [
     { value: '', label: 'Beneficiary' },
@@ -63,7 +61,10 @@ export default function FilterBar({ filters = {}, onChange, onReset, className =
     ...tagList.map((t) => ({ value: t, label: t })),
   ];
 
-  const hasActiveFilters = Object.values(filters).some((v) => v !== '' && v != null);
+  const hasActiveFilters = Object.values(filters).some((v) => {
+    if (Array.isArray(v)) return v.length > 0;
+    return v !== '' && v != null;
+  });
 
   return (
     <div className={`flex flex-wrap items-center gap-2.5 py-1 ${className}`}>
@@ -104,11 +105,11 @@ export default function FilterBar({ filters = {}, onChange, onReset, className =
       />
 
       {/* Category */}
-      <Dropdown
-        value={filters.categoryId ?? ''}
-        onChange={(val) => onChange('categoryId', val)}
-        options={categoryOptions}
-        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[140px] sm:flex-none"
+      <CategoryFilter
+        categories={categories}
+        value={categoryIds}
+        onChange={(ids) => onChange('categoryIds', ids)}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[160px] sm:flex-none"
       />
 
       {/* Owner */}

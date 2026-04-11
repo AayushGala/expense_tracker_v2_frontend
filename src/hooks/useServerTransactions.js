@@ -42,7 +42,7 @@ export function useServerTransactions(filters = {}, page = 1) {
   const queryParams = useMemo(() => {
     const params = { page };
     const {
-      dateFrom, dateTo, type, accountId, categoryId,
+      dateFrom, dateTo, type, accountId, categoryIds,
       beneficiary, owner, platform, tag, search,
     } = filters;
 
@@ -50,7 +50,7 @@ export function useServerTransactions(filters = {}, page = 1) {
     if (dateTo) params.date_to = dateTo;
     if (type) params.type = type;
     if (accountId) params.account_id = accountId;
-    if (categoryId) params.category_id = categoryId;
+    if (categoryIds && categoryIds.length > 0) params.category_ids = categoryIds.join(',');
     if (beneficiary) params.beneficiary = beneficiary;
     if (owner) params.owner = owner;
     if (platform) params.platform = platform;

@@ -186,7 +186,7 @@ const EMPTY_FILTERS = {
   dateTo: '',
   type: '',
   accountId: '',
-  categoryId: '',
+  categoryIds: [],
   beneficiary: '',
   platform: '',
   tag: '',

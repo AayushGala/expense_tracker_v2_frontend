@@ -10,12 +10,12 @@ import {
 } from 'recharts';
 import Card from '../common/Card';
 import Dropdown from '../common/Dropdown';
+import CategoryFilter from '../common/CategoryFilter';
 import { useReports } from '../../hooks/useReports';
 import { useOwners } from '../../hooks/useOwners';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useData } from '../../context/DataContext';
 import { formatINR, formatDate } from '../../utils/formatters';
-import { categoryOptions } from '../../utils/formStyles';
 
 function shortMonth(monthKey) {
   const [year, month] = monthKey.split('-');
@@ -38,21 +38,16 @@ export default function SpendingTrends() {
   const { categories } = useData();
   const { owners, ownerOptions } = useOwners();
 
-  const expenseCategories = useMemo(
-    () => categories.filter((c) => c.type === 'expense'),
-    [categories]
-  );
-
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState('');
 
   const data = useMemo(
     () =>
-      spendingTrends(selectedCategory || undefined, 12, selectedOwner || undefined).map((d) => ({
+      spendingTrends(selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined, 12, selectedOwner || undefined).map((d) => ({
         ...d,
         label: shortMonth(d.month),
       })),
-    [spendingTrends, selectedCategory, selectedOwner]
+    [spendingTrends, selectedCategoryIds, selectedOwner]
   );
 
   const total = useMemo(() => data.reduce((s, d) => s + d.total, 0), [data]);
@@ -60,20 +55,23 @@ export default function SpendingTrends() {
   const avg = nonZero.length ? total / nonZero.length : 0;
   const peak = useMemo(() => Math.max(0, ...data.map((d) => d.total)), [data]);
 
-  // Transaction list — filtered by type=expense, optionally by category and owner
+  // Transaction list — filtered by type=expense, optionally by categories and owner
   const txnFilters = useMemo(() => {
     const f = { type: 'expense' };
-    if (selectedCategory) f.categoryId = selectedCategory;
+    if (selectedCategoryIds.length > 0) f.categoryIds = selectedCategoryIds;
     if (selectedOwner) f.owner = selectedOwner;
     return f;
-  }, [selectedCategory, selectedOwner]);
+  }, [selectedCategoryIds, selectedOwner]);
 
   const { filteredTransactions } = useTransactions(txnFilters);
 
-  const categoryName = useMemo(
-    () => categories.find((c) => c.id === selectedCategory)?.name ?? null,
-    [categories, selectedCategory]
-  );
+  const categoryLabel = useMemo(() => {
+    if (selectedCategoryIds.length === 0) return null;
+    if (selectedCategoryIds.length === 1) {
+      return categories.find((c) => c.id === selectedCategoryIds[0])?.name ?? null;
+    }
+    return `${selectedCategoryIds.length} categories`;
+  }, [categories, selectedCategoryIds]);
 
   return (
     <div className="space-y-4">
@@ -88,13 +86,11 @@ export default function SpendingTrends() {
             className="min-w-[130px]"
           />
         )}
-        <Dropdown
-          value={selectedCategory}
-          onChange={setSelectedCategory}
-          options={[
-            { value: '', label: 'All categories' },
-            ...categoryOptions(expenseCategories),
-          ]}
+        <CategoryFilter
+          categories={categories}
+          value={selectedCategoryIds}
+          onChange={setSelectedCategoryIds}
+          filterType="expense"
           className="min-w-[180px]"
         />
       </div>
@@ -115,9 +111,9 @@ export default function SpendingTrends() {
 
       {/* Chart */}
       <Card className="p-5">
-        {categoryName && (
+        {categoryLabel && (
           <p className="text-sm font-medium text-gray-600 mb-3">
-            Monthly spend — {categoryName}
+            Monthly spend — {categoryLabel}
           </p>
         )}
         <ResponsiveContainer width="100%" height={280}>
@@ -152,7 +148,7 @@ export default function SpendingTrends() {
       {/* Transaction list */}
       <Card className="p-5">
         <p className="text-sm font-medium text-gray-600 mb-3">
-          {categoryName ? `${categoryName} Transactions` : 'All Expense Transactions'} ({filteredTransactions.length})
+          {categoryLabel ? `${categoryLabel} Transactions` : 'All Expense Transactions'} ({filteredTransactions.length})
         </p>
         {filteredTransactions.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-6">No transactions found.</p>
@@ -166,7 +162,7 @@ export default function SpendingTrends() {
                   </p>
                   <p className="text-xs text-gray-400">
                     {formatDate(txn.date)}
-                    {txn.categoryNames?.length > 0 && !selectedCategory && ` · ${txn.categoryNames[0]}`}
+                    {txn.categoryNames?.length > 0 && selectedCategoryIds.length === 0 && ` · ${txn.categoryNames[0]}`}
                     {txn.platform && ` · ${txn.platform}`}
                   </p>
                 </div>

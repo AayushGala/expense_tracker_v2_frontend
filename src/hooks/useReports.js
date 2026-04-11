@@ -195,20 +195,22 @@ export function useReports() {
   // ── spendingTrends ────────────────────────────────────────────────────────
 
   /**
-   * Returns monthly expense totals, optionally filtered to a single category
+   * Returns monthly expense totals, optionally filtered to categories
    * and/or owner.
    *
-   * @param {string} [categoryId]
+   * @param {number|number[]} [categoryIds] - single ID or array of IDs
    * @param {number} [months=12]
    * @param {string} [owner]
    * @returns {Array<{ month: string, total: number }>}
    */
-  const spendingTrends = useCallback((categoryId, months = 12, owner) => {
+  const spendingTrends = useCallback((categoryIds, months = 12, owner) => {
     const keys = generateMonthKeys(months);
     const totals = Object.fromEntries(keys.map((k) => [k, 0]));
 
+    const ids = Array.isArray(categoryIds) ? categoryIds : categoryIds ? [categoryIds] : null;
+
     for (const entry of expenseEntries) {
-      if (categoryId && entry.category_id !== categoryId) continue;
+      if (ids && ids.length > 0 && !ids.includes(entry.category_id)) continue;
       const txn = txnMap.get(entry.transaction_id);
       if (!txn) continue;
       if (owner && txn.owner !== owner) continue;
