@@ -143,21 +143,31 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
     }
   }
 
+  // Find next/prev non-disabled index
+  function nextEnabledIndex(from, direction) {
+    let i = from + direction;
+    while (i >= 0 && i < filteredOptions.length) {
+      if (!filteredOptions[i].disabled) return i;
+      i += direction;
+    }
+    return from; // stay put if nothing found
+  }
+
   function handleOptionKeyDown(e, idx, optValue) {
     switch (e.key) {
       case 'ArrowDown': {
         e.preventDefault();
-        const next = idx < filteredOptions.length - 1 ? idx + 1 : idx;
+        const next = nextEnabledIndex(idx, 1);
         focusedIndexRef.current = next;
         optionRefs.current[next]?.focus();
         break;
       }
       case 'ArrowUp': {
         e.preventDefault();
-        if (idx === 0 && showSearch) {
+        const prev = nextEnabledIndex(idx, -1);
+        if (prev === idx && showSearch) {
           searchRef.current?.focus();
         } else {
-          const prev = idx > 0 ? idx - 1 : idx;
           focusedIndexRef.current = prev;
           optionRefs.current[prev]?.focus();
         }
@@ -171,13 +181,14 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
       }
       case 'Home': {
         e.preventDefault();
-        focusedIndexRef.current = 0;
-        optionRefs.current[0]?.focus();
+        const first = nextEnabledIndex(-1, 1);
+        focusedIndexRef.current = first;
+        optionRefs.current[first]?.focus();
         break;
       }
       case 'End': {
         e.preventDefault();
-        const last = filteredOptions.length - 1;
+        const last = nextEnabledIndex(filteredOptions.length, -1);
         focusedIndexRef.current = last;
         optionRefs.current[last]?.focus();
         break;
@@ -203,6 +214,13 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
         aria-haspopup="listbox"
         aria-expanded={open}
         onMouseDown={handleToggle}
+        onFocus={() => {
+          if (!open) {
+            closeAll();
+            updatePosition();
+            setOpen(true);
+          }
+        }}
         onKeyDown={handleTriggerKeyDown}
         className={`
           w-full flex items-center gap-2 rounded-xl border bg-white
@@ -246,7 +264,9 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
                   if (e.key === 'Escape') { setOpen(false); triggerRef.current?.focus(); }
                   if (e.key === 'ArrowDown') {
                     e.preventDefault();
-                    optionRefs.current[0]?.focus();
+                    // Skip to first non-disabled option
+                    const first = filteredOptions.findIndex((o) => !o.disabled);
+                    if (first >= 0) optionRefs.current[first]?.focus();
                   }
                   if (e.key === 'Enter') {
                     const selectable = filteredOptions.filter((o) => !o.disabled);
@@ -293,8 +313,9 @@ export default function Dropdown({ value, onChange, options = [], placeholder, c
                     onKeyDown={(e) => handleOptionKeyDown(e, idx, opt.value)}
                     className={`
                       w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2
+                      outline-none !ring-0 focus-visible:outline-none focus:bg-gray-100
                       ${isSelected
-                        ? 'bg-accent-light text-brand font-semibold'
+                        ? 'bg-accent-light text-brand font-semibold focus:bg-accent-light/80'
                         : 'text-gray-700 hover:bg-gray-50'
                       }
                     `}

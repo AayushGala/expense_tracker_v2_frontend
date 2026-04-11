@@ -71,3 +71,10 @@
   outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
 }
+
+/* Remove focus outline inside dropdown menus */
+[role="listbox"] button:focus-visible,
+[role="listbox"] button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
