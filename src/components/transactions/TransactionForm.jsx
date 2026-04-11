@@ -132,9 +132,25 @@ export default function TransactionForm() {
     }
   }
 
+  // When type changes during editing, only carry over shared fields
+  const formInitialData = (() => {
+    if (!initialData) return null;
+    if (type === initialData.type) return initialData;
+    // Type changed — keep only shared fields, clear type-specific ones
+    return {
+      amount: initialData.amount,
+      date: initialData.date,
+      notes: initialData.notes,
+      platform: initialData.platform,
+      owner: initialData.owner,
+      tags: initialData.tags,
+      beneficiary: initialData.beneficiary,
+    };
+  })();
+
   const formProps = {
     onSubmit: handleSubmit,
-    initialData,
+    initialData: formInitialData,
   };
 
   function renderSubForm() {
@@ -186,7 +202,7 @@ export default function TransactionForm() {
       {/* Transaction type card */}
       <Card className="p-5 mb-6">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">Transaction Type</p>
-        <TypeSelector value={type} onChange={setType} disabled={isEditing} />
+        <TypeSelector value={type} onChange={setType} />
       </Card>
 
       {/* Form card */}
