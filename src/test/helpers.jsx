@@ -76,6 +76,10 @@ export function createMockApi(overrides = {}) {
     updateCategory: vi.fn().mockImplementation((id, data) => Promise.resolve({ id, ...data })),
     deleteCategory: vi.fn().mockResolvedValue(null),
     getTransactions: vi.fn().mockResolvedValue([]),
+    getTransactionSummary: vi.fn().mockResolvedValue({
+      total_outflow: 0, total_inflow: 0, net: 0, count: 0,
+      transfer_count: 0, transfer_amount: 0,
+    }),
     createTransaction: vi.fn().mockResolvedValue({ id: 1, entries: [], receivables: [] }),
     updateTransaction: vi.fn().mockResolvedValue({ id: 1, entries: [] }),
     deleteTransaction: vi.fn().mockResolvedValue(null),

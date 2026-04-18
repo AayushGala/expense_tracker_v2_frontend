@@ -101,6 +101,10 @@ const api = {
   deleteTransaction: (id) => request('DELETE', `/api/transactions/${id}/`),
   getTransactionTags: () => request('GET', '/api/transactions/tags/'),
   getTransactionPlatforms: () => request('GET', '/api/transactions/platforms/'),
+  getTransactionSummary: (params) => {
+    const qs = params ? new URLSearchParams(params).toString() : '';
+    return request('GET', `/api/transactions/summary/${qs ? '?' + qs : ''}`);
+  },
 
   // Receivables
   getReceivables: (params) => {

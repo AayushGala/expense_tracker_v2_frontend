@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '../hooks/useTransactions';
+import { useTransactionSummary } from '../hooks/useTransactionSummary';
 import { useData } from '../context/DataContext';
 import FilterBar from '../components/common/FilterBar';
 import Badge from '../components/common/Badge';
@@ -9,6 +10,7 @@ import EmptyState from '../components/common/EmptyState';
 import Modal from '../components/common/Modal';
 import Card from '../components/common/Card';
 import TransactionDetail from '../components/transactions/TransactionDetail';
+import TransactionSummary from '../components/transactions/TransactionSummary';
 import { formatDate, transactionTypeLabel } from '../utils/formatters';
 import TypeIcon, { getVariant } from '../components/common/TypeIcon';
 
@@ -199,8 +201,10 @@ export default function TransactionsPage() {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [splitMode, setSplitMode] = useState('my_share');
 
   const { filteredTransactions, getTransactionEntries } = useTransactions(filters);
+  const { summary, isLoading: summaryLoading } = useTransactionSummary(filters, splitMode);
 
   const totalPages = Math.ceil(filteredTransactions.length / PAGE_SIZE);
   const paginatedTxns = filteredTransactions.slice(
@@ -242,6 +246,16 @@ export default function TransactionsPage() {
           filters={filters}
           onChange={handleFilterChange}
           onReset={handleReset}
+        />
+      </Card>
+
+      {/* Summary */}
+      <Card className="p-0 overflow-hidden">
+        <TransactionSummary
+          summary={summary}
+          isLoading={summaryLoading}
+          splitMode={splitMode}
+          onSplitModeChange={setSplitMode}
         />
       </Card>
 
