@@ -12,6 +12,7 @@ import Card from '../components/common/Card';
 import TransactionDetail from '../components/transactions/TransactionDetail';
 import TransactionSummary from '../components/transactions/TransactionSummary';
 import { formatDate, transactionTypeLabel } from '../utils/formatters';
+import { getThisMonthRange } from '../utils/datePresets';
 import TypeIcon, { getVariant } from '../components/common/TypeIcon';
 
 // ---------------------------------------------------------------------------
@@ -194,11 +195,17 @@ const EMPTY_FILTERS = {
   search: '',
 };
 
+/** Page defaults to the current month so the summary is immediately relevant. */
+function getDefaultFilters() {
+  const { dateFrom, dateTo } = getThisMonthRange();
+  return { ...EMPTY_FILTERS, dateFrom, dateTo };
+}
+
 export default function TransactionsPage() {
   const navigate = useNavigate();
   const { isLoading, deleteTransaction } = useData();
 
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [filters, setFilters] = useState(getDefaultFilters);
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [splitMode, setSplitMode] = useState('my_share');
@@ -214,6 +221,11 @@ export default function TransactionsPage() {
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  }, []);
+
+  const handleBulkFilterChange = useCallback((partial) => {
+    setFilters((prev) => ({ ...prev, ...partial }));
     setCurrentPage(1);
   }, []);
 
@@ -245,6 +257,7 @@ export default function TransactionsPage() {
         <FilterBar
           filters={filters}
           onChange={handleFilterChange}
+          onBulkChange={handleBulkFilterChange}
           onReset={handleReset}
         />
       </Card>

@@ -5,6 +5,7 @@ import api from '../../api/client';
 import Dropdown from './Dropdown';
 import CategoryFilter from './CategoryFilter';
 import CalendarPicker from './CalendarPicker';
+import { DATE_PRESETS, detectPreset } from '../../utils/datePresets';
 
 const TRANSACTION_TYPES = [
   { value: '',              label: 'All Types' },
@@ -18,7 +19,7 @@ const TRANSACTION_TYPES = [
   { value: 'reimbursement', label: 'Reimbursement' },
 ];
 
-export default function FilterBar({ filters = {}, onChange, onReset, className = '' }) {
+export default function FilterBar({ filters = {}, onChange, onBulkChange, onReset, className = '' }) {
   const { accounts, categories, transactions } = useData();
   const { ownerOptions } = useOwners();
 
@@ -68,6 +69,25 @@ export default function FilterBar({ filters = {}, onChange, onReset, className =
 
   return (
     <div className={`flex flex-wrap items-center gap-2.5 py-1 ${className}`}>
+      {/* Date preset */}
+      <Dropdown
+        value={detectPreset(filters.dateFrom, filters.dateTo)}
+        placeholder="Custom"
+        onChange={(presetKey) => {
+          const preset = DATE_PRESETS.find((p) => p.value === presetKey);
+          if (!preset) return;
+          const { dateFrom, dateTo } = preset.getRange();
+          if (onBulkChange) {
+            onBulkChange({ dateFrom, dateTo });
+          } else {
+            onChange('dateFrom', dateFrom);
+            onChange('dateTo', dateTo);
+          }
+        }}
+        options={DATE_PRESETS.map((p) => ({ value: p.value, label: p.label }))}
+        className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[140px] sm:flex-none"
+      />
+
       {/* Date range */}
       <div className="flex items-center gap-1.5 w-full sm:w-auto">
         <CalendarPicker
