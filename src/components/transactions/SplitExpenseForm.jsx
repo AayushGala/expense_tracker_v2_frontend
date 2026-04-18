@@ -38,8 +38,11 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
   const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
 
+  // Generate a unique ID for tracking people in the UI (not persisted)
+  const makeId = () => `p_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
   // Each other person: { id, name, amount }
-  const [otherPeople, setOtherPeople] = useState([{ id: crypto.randomUUID(), name: '', amount: '' }]);
+  const [otherPeople, setOtherPeople] = useState([{ id: makeId(), name: '', amount: '' }]);
 
   const [errors, setErrors] = useState({});
 
@@ -59,7 +62,7 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
   function addPerson() {
     setOtherPeople((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), name: '', amount: '' },
+      { id: makeId(), name: '', amount: '' },
     ]);
   }
 
