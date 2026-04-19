@@ -15,7 +15,9 @@ export default function CashbackForm({ onSubmit, initialData }) {
   const { accounts, categories } = useData();
   const { owners, getAccountOwner } = useOwners();
 
-  const assetAccounts = accounts.filter((a) => a.type === 'asset' && a.is_active !== false);
+  const eligibleAccounts = accounts.filter(
+    (a) => (a.type === 'asset' || a.type === 'liability') && a.is_active !== false
+  );
 
   // Find cashback income category — prefer name containing "cashback", else first income
   const cashbackCategory = useMemo(() => {
@@ -121,7 +123,7 @@ export default function CashbackForm({ onSubmit, initialData }) {
           <Select
             value={accountId}
             onChange={(e) => handleAccountChange(e.target.value)}
-            options={assetAccounts.map(accountOption)}
+            options={eligibleAccounts.map(accountOption)}
             placeholder="Select account"
           />
           {errors.accountId && <p className={errorClass}>{errors.accountId}</p>}
