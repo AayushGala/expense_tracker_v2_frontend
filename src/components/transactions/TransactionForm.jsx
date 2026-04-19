@@ -17,11 +17,14 @@ import Card from '../common/Card';
  * The Transaction model only stores type/date/notes/etc.
  * The amounts and account references live in the Entry objects.
  */
-function buildInitialData(transaction, entries, accounts) {
+function buildInitialData(transaction, entries, accounts, receivables) {
   if (!transaction) return null;
 
   const txnEntries = entries.filter(
     (e) => e.transaction_id === transaction.id
+  );
+  const txnReceivables = (receivables ?? []).filter(
+    (r) => r.transaction === transaction.id || r.transaction_id === transaction.id
   );
 
   // Separate entries into account entries and category entries
@@ -76,12 +79,20 @@ function buildInitialData(transaction, entries, accounts) {
         category_id: transaction.category_id ?? creditCategoryEntry?.category_id ?? '',
       };
 
-    case 'split_expense':
+    case 'split_expense': {
+      // CREDIT account entry = total_amount paid from bank
+      // DEBIT category entry = my_share
+      const totalAmount = creditAccountEntry?.amount ?? '';
+      const myShare = debitCategoryEntry?.amount ?? '';
       return {
         ...base,
         from_account_id: creditAccountEntry?.account_id ?? '',
         category_id: transaction.category_id ?? debitCategoryEntry?.category_id ?? '',
+        total_amount: totalAmount,
+        my_share: myShare,
+        receivables: txnReceivables,
       };
+    }
 
     case 'reimbursement':
       return {
@@ -97,7 +108,7 @@ function buildInitialData(transaction, entries, accounts) {
 export default function TransactionForm() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { transactions, entries, accounts, addTransaction, updateTransaction } = useData();
+  const { transactions, entries, accounts, receivables, addTransaction, updateTransaction } = useData();
 
   const isEditing = Boolean(id);
 
@@ -106,8 +117,8 @@ export default function TransactionForm() {
     if (!id) return null;
     const txn = transactions.find((t) => String(t.id) === String(id));
     if (!txn) return null;
-    return buildInitialData(txn, entries, accounts);
-  }, [id, transactions, entries, accounts]);
+    return buildInitialData(txn, entries, accounts, receivables);
+  }, [id, transactions, entries, accounts, receivables]);
 
   const [type, setType] = useState(initialData?.type ?? 'expense');
   const [submitting, setSubmitting] = useState(false);

@@ -26,23 +26,41 @@ export default function SplitExpenseForm({ onSubmit, initialData }) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const [totalAmount, setTotalAmount] = useState(initialData?.amount ?? '');
+  // Generate a unique ID for tracking people in the UI (not persisted)
+  const makeId = () => `p_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+  const initialReceivables = initialData?.receivables ?? [];
+  const isEditing = Boolean(initialData?.id);
+
+  const [totalAmount, setTotalAmount] = useState(
+    initialData?.total_amount ?? initialData?.amount ?? ''
+  );
   const [date, setDate] = useState(initialData?.date ?? today);
   const [fromAccountId, setFromAccountId] = useState(String(initialData?.from_account_id ?? ''));
   const [owner, setOwner] = useState(initialData?.owner ?? '');
   const [categoryId, setCategoryId] = useState(String(initialData?.category_id ?? ''));
-  const [totalPeople, setTotalPeople] = useState('2');
+  const [totalPeople, setTotalPeople] = useState(
+    isEditing ? String(initialReceivables.length + 1) : '2'
+  );
   // myShareType: 'equal' (even split) | 'custom' (enter amount directly)
-  const [myShareType, setMyShareType] = useState('equal');
-  const [customMyShare, setCustomMyShare] = useState('');
+  // On edit, default to 'custom' so the pre-filled my_share is visible and editable
+  const [myShareType, setMyShareType] = useState(isEditing ? 'custom' : 'equal');
+  const [customMyShare, setCustomMyShare] = useState(
+    initialData?.my_share != null ? String(initialData.my_share) : ''
+  );
   const [platform, setPlatform] = useState(initialData?.platform ?? '');
   const [notes, setNotes] = useState(initialData?.notes ?? '');
 
-  // Generate a unique ID for tracking people in the UI (not persisted)
-  const makeId = () => `p_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-
   // Each other person: { id, name, amount }
-  const [otherPeople, setOtherPeople] = useState([{ id: makeId(), name: '', amount: '' }]);
+  const [otherPeople, setOtherPeople] = useState(
+    initialReceivables.length > 0
+      ? initialReceivables.map((r) => ({
+          id: makeId(),
+          name: r.person_name,
+          amount: String(r.amount_owed),
+        }))
+      : [{ id: makeId(), name: '', amount: '' }]
+  );
 
   const [errors, setErrors] = useState({});
 
