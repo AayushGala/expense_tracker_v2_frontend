@@ -11,6 +11,7 @@ import Modal from '../components/common/Modal';
 import Card from '../components/common/Card';
 import TransactionDetail from '../components/transactions/TransactionDetail';
 import TransactionSummary from '../components/transactions/TransactionSummary';
+import SavedViews from '../components/transactions/SavedViews';
 import { formatDate, transactionTypeLabel } from '../utils/formatters';
 import { getThisMonthRange } from '../utils/datePresets';
 import TypeIcon, { getVariant } from '../components/common/TypeIcon';
@@ -253,7 +254,16 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filter bar */}
-      <Card className="px-5 py-4 overflow-visible">
+      <Card className="px-5 py-4 overflow-visible space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Saved Views</p>
+          <SavedViews
+            filters={filters}
+            onApply={handleBulkFilterChange}
+            className="w-56"
+          />
+        </div>
+        <div className="border-t border-gray-100 -mx-5" />
         <FilterBar
           filters={filters}
           onChange={handleFilterChange}
