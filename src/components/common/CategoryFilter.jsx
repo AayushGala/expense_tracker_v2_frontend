@@ -142,6 +142,32 @@ export default function CategoryFilter({ categories, value = [], onChange, filte
       .filter((section) => section.parents.length > 0);
   }, [sections, childrenMap, searchLower, search]);
 
+  // All currently-visible (filtered) category IDs — for Select All
+  const visibleIds = useMemo(() => {
+    const ids = [];
+    for (const section of filteredSections) {
+      for (const parent of section.parents) {
+        const children = (childrenMap.get(parent.id) ?? []).filter(
+          (c) => !search || c.name.toLowerCase().includes(searchLower) || parent.name.toLowerCase().includes(searchLower)
+        );
+        if (children.length > 0) {
+          ids.push(...children.map((c) => c.id));
+        } else {
+          ids.push(parent.id);
+        }
+      }
+    }
+    return ids;
+  }, [filteredSections, childrenMap, search, searchLower]);
+
+  function handleSelectAll() {
+    if (value.length > 0) {
+      onChange([]);
+    } else {
+      onChange(visibleIds);
+    }
+  }
+
   // Position menu
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
@@ -257,6 +283,17 @@ export default function CategoryFilter({ categories, value = [], onChange, filte
               className="w-full text-sm px-2.5 py-1.5 rounded-lg border border-gray-200 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20 placeholder-gray-400"
             />
           </div>
+
+          {/* Select All / Clear All */}
+          {visibleIds.length > 0 && (
+            <button
+              type="button"
+              onMouseDown={(e) => { e.preventDefault(); handleSelectAll(); }}
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-accent hover:bg-accent-light/30 border-b border-gray-100 transition-colors"
+            >
+              {value.length > 0 ? 'Clear All' : 'Select All'}
+            </button>
+          )}
 
           {/* Options */}
           <div className="overflow-y-auto py-1">
