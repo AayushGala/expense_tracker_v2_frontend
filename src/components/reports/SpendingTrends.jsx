@@ -35,19 +35,33 @@ function CustomTooltip({ active, payload, label }) {
 
 export default function SpendingTrends() {
   const { spendingTrends } = useReports();
-  const { categories } = useData();
+  const { categories, transactions } = useData();
   const { owners, ownerOptions } = useOwners();
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState('');
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState('');
+
+  const beneficiaryOptions = useMemo(() => {
+    const set = new Set(transactions.map((t) => t.beneficiary).filter(Boolean));
+    return [
+      { value: '', label: 'All Beneficiaries' },
+      ...[...set].sort((a, b) => a.localeCompare(b)).map((b) => ({ value: b, label: b })),
+    ];
+  }, [transactions]);
 
   const data = useMemo(
     () =>
-      spendingTrends(selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined, 12, selectedOwner || undefined).map((d) => ({
+      spendingTrends(
+        selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
+        12,
+        selectedOwner || undefined,
+        selectedBeneficiary || undefined
+      ).map((d) => ({
         ...d,
         label: shortMonth(d.month),
       })),
-    [spendingTrends, selectedCategoryIds, selectedOwner]
+    [spendingTrends, selectedCategoryIds, selectedOwner, selectedBeneficiary]
   );
 
   const total = useMemo(() => data.reduce((s, d) => s + d.total, 0), [data]);
@@ -55,13 +69,14 @@ export default function SpendingTrends() {
   const avg = nonZero.length ? total / nonZero.length : 0;
   const peak = useMemo(() => Math.max(0, ...data.map((d) => d.total)), [data]);
 
-  // Transaction list — filtered by type=expense, optionally by categories and owner
+  // Transaction list — filtered by type=expense, optionally by categories, owner, beneficiary
   const txnFilters = useMemo(() => {
     const f = { type: 'expense' };
     if (selectedCategoryIds.length > 0) f.categoryIds = selectedCategoryIds;
     if (selectedOwner) f.owner = selectedOwner;
+    if (selectedBeneficiary) f.beneficiary = selectedBeneficiary;
     return f;
-  }, [selectedCategoryIds, selectedOwner]);
+  }, [selectedCategoryIds, selectedOwner, selectedBeneficiary]);
 
   const { filteredTransactions } = useTransactions(txnFilters);
 
@@ -84,6 +99,14 @@ export default function SpendingTrends() {
             onChange={setSelectedOwner}
             options={ownerOptions}
             className="min-w-[130px]"
+          />
+        )}
+        {beneficiaryOptions.length > 1 && (
+          <Dropdown
+            value={selectedBeneficiary}
+            onChange={setSelectedBeneficiary}
+            options={beneficiaryOptions}
+            className="min-w-[150px]"
           />
         )}
         <CategoryFilter

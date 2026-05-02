@@ -13,6 +13,7 @@ import Card from '../common/Card';
 import Dropdown from '../common/Dropdown';
 import { useReports } from '../../hooks/useReports';
 import { useOwners } from '../../hooks/useOwners';
+import { useData } from '../../context/DataContext';
 import { formatINR } from '../../utils/formatters';
 
 function shortMonth(monthKey) {
@@ -38,16 +39,26 @@ function CustomTooltip({ active, payload, label }) {
 export default function CashflowReport() {
   const { cashflow } = useReports();
   const { owners, ownerOptions } = useOwners();
+  const { transactions } = useData();
 
   const [selectedOwner, setSelectedOwner] = useState('');
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState('');
+
+  const beneficiaryOptions = useMemo(() => {
+    const set = new Set(transactions.map((t) => t.beneficiary).filter(Boolean));
+    return [
+      { value: '', label: 'All Beneficiaries' },
+      ...[...set].sort((a, b) => a.localeCompare(b)).map((b) => ({ value: b, label: b })),
+    ];
+  }, [transactions]);
 
   const data = useMemo(
     () =>
-      cashflow(12, selectedOwner || undefined).map((d) => ({
+      cashflow(12, selectedOwner || undefined, selectedBeneficiary || undefined).map((d) => ({
         ...d,
         label: shortMonth(d.month),
       })),
-    [cashflow, selectedOwner]
+    [cashflow, selectedOwner, selectedBeneficiary]
   );
 
   const totals = useMemo(
@@ -75,6 +86,14 @@ export default function CashflowReport() {
             onChange={setSelectedOwner}
             options={ownerOptions}
             className="min-w-[130px]"
+          />
+        )}
+        {beneficiaryOptions.length > 1 && (
+          <Dropdown
+            value={selectedBeneficiary}
+            onChange={setSelectedBeneficiary}
+            options={beneficiaryOptions}
+            className="min-w-[150px]"
           />
         )}
       </div>

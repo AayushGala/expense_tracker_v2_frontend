@@ -154,9 +154,10 @@ export function useReports() {
    *
    * @param {number} [months=12]
    * @param {string} [owner]
+   * @param {string} [beneficiary]
    * @returns {Array<{ month: string, income: number, expenses: number, investments: number }>}
    */
-  const cashflow = useCallback((months = 12, owner) => {
+  const cashflow = useCallback((months = 12, owner, beneficiary) => {
     const keys = generateMonthKeys(months);
     const data = Object.fromEntries(
       keys.map((k) => [k, { income: 0, expenses: 0, investments: 0 }])
@@ -166,6 +167,7 @@ export function useReports() {
       const txn = txnMap.get(entry.transaction_id);
       if (!txn) continue;
       if (owner && txn.owner !== owner) continue;
+      if (beneficiary && txn.beneficiary !== beneficiary) continue;
       const key = toMonthKey(txn.date);
       if (!data[key]) continue;
       data[key].expenses = Math.round((data[key].expenses + entry.amount) * 100) / 100;
@@ -175,6 +177,7 @@ export function useReports() {
       const txn = txnMap.get(entry.transaction_id);
       if (!txn) continue;
       if (owner && txn.owner !== owner) continue;
+      if (beneficiary && txn.beneficiary !== beneficiary) continue;
       const key = toMonthKey(txn.date);
       if (!data[key]) continue;
       data[key].income = Math.round((data[key].income + entry.amount) * 100) / 100;
@@ -182,6 +185,7 @@ export function useReports() {
 
     for (const txn of investmentTxns) {
       if (owner && txn.owner !== owner) continue;
+      if (beneficiary && txn.beneficiary !== beneficiary) continue;
       const key = toMonthKey(txn.date);
       if (!data[key]) continue;
       data[key].investments = Math.round(
@@ -201,9 +205,10 @@ export function useReports() {
    * @param {number|number[]} [categoryIds] - single ID or array of IDs
    * @param {number} [months=12]
    * @param {string} [owner]
+   * @param {string} [beneficiary]
    * @returns {Array<{ month: string, total: number }>}
    */
-  const spendingTrends = useCallback((categoryIds, months = 12, owner) => {
+  const spendingTrends = useCallback((categoryIds, months = 12, owner, beneficiary) => {
     const keys = generateMonthKeys(months);
     const totals = Object.fromEntries(keys.map((k) => [k, 0]));
 
@@ -214,6 +219,7 @@ export function useReports() {
       const txn = txnMap.get(entry.transaction_id);
       if (!txn) continue;
       if (owner && txn.owner !== owner) continue;
+      if (beneficiary && txn.beneficiary !== beneficiary) continue;
       const key = toMonthKey(txn.date);
       if (!Object.prototype.hasOwnProperty.call(totals, key)) continue;
       totals[key] = Math.round((totals[key] + entry.amount) * 100) / 100;
