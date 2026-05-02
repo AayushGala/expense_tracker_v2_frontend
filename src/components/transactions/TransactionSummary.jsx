@@ -1,6 +1,6 @@
 import { formatINR } from '../../utils/formatters';
 
-function StatBlock({ label, value, variant = 'neutral' }) {
+function StatBlock({ label, value, variant = 'neutral', format = 'currency' }) {
   const colorClass =
     variant === 'outflow'
       ? 'text-gray-900'
@@ -10,10 +10,12 @@ function StatBlock({ label, value, variant = 'neutral' }) {
       ? 'text-gray-900'
       : 'text-gray-500';
 
+  const display = format === 'currency' ? formatINR(value) : value;
+
   return (
     <div className="flex flex-col">
       <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">{label}</p>
-      <p className={`text-lg font-bold tabular-nums mt-0.5 ${colorClass}`}>{formatINR(value)}</p>
+      <p className={`text-lg font-bold tabular-nums mt-0.5 ${colorClass}`}>{display}</p>
     </div>
   );
 }
@@ -34,7 +36,7 @@ export default function TransactionSummary({ summary, isLoading, splitMode, onSp
         <StatBlock label="Spent" value={summary.total_outflow} variant="outflow" />
         <StatBlock label="Received" value={summary.total_inflow} variant="inflow" />
         <StatBlock label="Net" value={summary.net} variant="net" />
-        <StatBlock label="Count" value={summary.count} />
+        <StatBlock label="Count" value={summary.count} format="plain" />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100">
